@@ -1,3 +1,4 @@
+<<<<<<< HEAD
     </main>
   </div>
 </div>
@@ -33,3 +34,6 @@
 })();
 </script>
 </body></html>
+=======
+</main><script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script><script src="<?= base_url('assets/js/admin.js') ?>"></script></body></html>
+>>>>>>> 06a59cbe467985b9066497ce222b50e461966c1b

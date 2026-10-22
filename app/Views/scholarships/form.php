@@ -148,30 +148,4 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
     </fieldset>
 </template>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var list = document.getElementById('requirement-list');
-    var template = document.getElementById('requirement-template');
-
-    function updateRequirementNumbers() {
-        list.querySelectorAll('.requirement-number').forEach(function (number, index) {
-            number.textContent = String(index + 1);
-        });
-    }
-
-    document.getElementById('add-requirement').addEventListener('click', function () {
-        list.appendChild(template.content.cloneNode(true));
-        updateRequirementNumbers();
-    });
-
-    list.addEventListener('click', function (event) {
-        if (event.target.classList.contains('remove-requirement')) {
-            event.target.closest('.requirement-item').remove();
-            updateRequirementNumbers();
-        }
-    });
-
-    updateRequirementNumbers();
-});
-</script>
 <?php include APPPATH . 'Views/admin/_footer.php'; ?>
