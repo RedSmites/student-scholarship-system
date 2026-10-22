@@ -101,7 +101,7 @@ class Auth extends BaseController
         ]);
 
         if ($user['role'] === 'admin') {
-            return redirect()->to(site_url('administrator'));
+            return redirect()->to(site_url('dashboard'));
         }
 
         return redirect()->to(site_url('dashboard'));
@@ -115,4 +115,3 @@ class Auth extends BaseController
             ->with('success', 'You have been logged out.');
     }
 }
-

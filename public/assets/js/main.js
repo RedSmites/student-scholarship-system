@@ -29,8 +29,10 @@
 
   function mobileNavToogle() {
     document.querySelector('body').classList.toggle('mobile-nav-active');
-    mobileNavToggleBtn.classList.toggle('bi-list');
-    mobileNavToggleBtn.classList.toggle('bi-x');
+    const isExpanded = document.body.classList.contains('mobile-nav-active');
+    mobileNavToggleBtn.setAttribute('aria-expanded', isExpanded);
+    mobileNavToggleBtn.setAttribute('aria-label', isExpanded ? 'Close navigation' : 'Open navigation');
+    mobileNavToggleBtn.textContent = isExpanded ? '×' : '☰';
   }
   mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
 
@@ -93,7 +95,8 @@
    * Animation on scroll function and init
    */
   function aosInit() {
-    AOS.init({
+    if (!window.AOS) return;
+    window.AOS.init({
       duration: 600,
       easing: 'ease-in-out',
       once: true,
@@ -105,9 +108,11 @@
   /**
    * Initiate glightbox
    */
-  const glightbox = GLightbox({
-    selector: '.glightbox'
-  });
+  if (window.GLightbox) {
+    window.GLightbox({
+      selector: '.glightbox'
+    });
+  }
 
   /**
    * Frequently Asked Questions Toggle
@@ -122,15 +127,17 @@
    * Init swiper sliders
    */
   function initSwiper() {
+    if (!window.Swiper) return;
     document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
       let config = JSON.parse(
         swiperElement.querySelector(".swiper-config").innerHTML.trim()
       );
 
       if (swiperElement.classList.contains("swiper-tab")) {
+        if (typeof window.initSwiperWithCustomPagination !== 'function') return;
         initSwiperWithCustomPagination(swiperElement, config);
       } else {
-        new Swiper(swiperElement, config);
+        new window.Swiper(swiperElement, config);
       }
     });
   }

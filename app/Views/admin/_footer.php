@@ -1,1 +1,1 @@
-</main><script src="<?= base_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script></body></html>
+</main><script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script></body></html>

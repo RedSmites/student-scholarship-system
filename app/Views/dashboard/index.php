@@ -1,98 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Student Dashboard</title>
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-</head>
-<body class="bg-light">
-
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="<?= site_url('dashboard') ?>">
-            Scholarship System
-        </a>
-
-        <form action="<?= site_url('logout') ?>" method="post" class="mb-0">
-            <?= csrf_field() ?>
-            <button type="submit" class="btn btn-outline-light btn-sm">
-                Logout
-            </button>
-        </form>
+<?php $title = 'Administrator dashboard'; include APPPATH . 'Views/admin/_header.php'; ?>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small text-primary fw-bold mb-1">Scholarship administration</p>
+        <h1 class="h2 mb-1">Welcome, <?= esc($name ?? 'Administrator') ?></h1>
+        <p class="text-muted mb-0">A current overview of applications and open scholarship programs.</p>
     </div>
-</nav>
+    <a class="btn btn-primary" href="<?= site_url('administrator') ?>">Review applications</a>
+</div>
 
-<main class="container py-5">
-    <div class="mb-4">
-        <h1 class="h2">
-            Welcome, <?= esc($name ?? 'Student') ?>!
-        </h1>
-        <p class="text-muted">
-            Welcome to your Student Scholarship Information System.
-        </p>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <section class="admin-card admin-stat-card is-total h-100">
+            <p class="text-muted mb-1">Total applications</p>
+            <h3><?= (int) $totalApplications ?></h3>
+            <p class="small mb-0">All submitted applications</p>
+        </section>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <section class="admin-card admin-stat-card is-total h-100">
+            <p class="text-muted mb-1">Applications to review</p>
+            <h3><?= (int) $pendingApplications ?></h3>
+            <p class="small mb-0">Pending, under review, or incomplete</p>
+        </section>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <section class="admin-card admin-stat-card is-safe h-100">
+            <p class="text-muted mb-1">Approved applications</p>
+            <h3><?= (int) $approvedApplications ?></h3>
+            <p class="small mb-0">Applications with an approved decision</p>
+        </section>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <section class="admin-card admin-stat-card is-total h-100">
+            <p class="text-muted mb-1">Open scholarships</p>
+            <h3><?= (int) $activeScholarships ?></h3>
+            <p class="small mb-0">Currently accepting applications</p>
+        </section>
+    </div>
+</div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5">Browse Scholarships</h2>
-                    <p class="text-muted">
-                        Explore available scholarship opportunities.
-                    </p>
-                    <span class="badge text-bg-secondary">
-                        <a href="<?= site_url('scholarships') ?>"
-                            class="btn btn-primary">
-                                Browse Scholarships
-                        </a>
-                    </span>
-                </div>
-            </div>
+<section class="admin-card">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h2 class="h5 mb-1">Recent applications</h2>
+            <p class="small text-muted mb-0">The latest submissions from the student application portal.</p>
         </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5">My Applications</h2>
-                    <p class="text-muted">
-                        Track the status of your scholarship applications.
-                    </p>
-                    <span class="badge text-bg-secondary">
-                        Coming soon
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5">My Account</h2>
-                    <p class="mb-2">
-                        <strong>Name:</strong>
-                        <?= esc($name ?? '') ?>
-                    </p>
-                    <p class="mb-2">
-                        <strong>Email:</strong>
-                        <?= esc($email ?? '') ?>
-                    </p>
-                    <p class="mb-0">
-                        <strong>Role:</strong>
-                        <?= esc(ucfirst($role ?? 'student')) ?>
-                    </p>
-                </div>
-            </div>
-        </div>
+        <a class="btn btn-sm btn-outline-primary" href="<?= site_url('administrator') ?>">View all applications</a>
     </div>
 
-    <div class="alert alert-info">
-        Your account is logged in successfully. More scholarship features
-        will be added next.
-    </div>
-</main>
-
-</body>
-</html>
+    <?php if (empty($recentApplications)): ?>
+        <p class="text-muted mb-0">No applications have been submitted yet.</p>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Applicant</th>
+                        <th scope="col">Scholarship</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Action</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($recentApplications as $application): ?>
+                        <?php
+                        $statusClass = match ($application['status']) {
+                            'approved' => 'success',
+                            'rejected' => 'danger',
+                            'incomplete' => 'warning',
+                            default => 'secondary',
+                        };
+                        ?>
+                        <tr>
+                            <td>
+                                <strong><?= esc($application['applicant_name'] ?: 'Applicant') ?></strong>
+                                <div class="small text-muted"><?= esc($application['email'] ?? '') ?></div>
+                            </td>
+                            <td><?= esc($application['scholarship_title'] ?? 'Scholarship unavailable') ?></td>
+                            <td><?= esc($application['created_at'] ?? '') ?></td>
+                            <td><span class="badge text-bg-<?= $statusClass ?>"><?= esc(ucwords(str_replace('_', ' ', $application['status']))) ?></span></td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="<?= site_url('administrator/' . (int) $application['id']) ?>">Review</a></td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif ?>
+</section>
+<?php include APPPATH . 'Views/admin/_footer.php'; ?>

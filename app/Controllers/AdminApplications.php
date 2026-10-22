@@ -105,11 +105,64 @@ class AdminApplications extends BaseController
         $document = db_connect()->table('application_documents')->where('id', $documentId)->get()->getRowArray();
         if (! $document) return redirect()->to(site_url('administrator'))->with('error', 'Document not found.');
 
-        $fileName = basename($document['file_path']);
-        $path = WRITEPATH . 'uploads/applications' . DIRECTORY_SEPARATOR . $fileName;
-        if (! is_file($path)) return redirect()->to(site_url('administrator/' . (int) $document['application_id']))->with('error', 'The stored document file is missing.');
+        $path = $this->storedDocumentPath($document);
+        if ($path === null || ! is_file($path)) return redirect()->to(site_url('administrator/' . (int) $document['application_id']))->with('error', 'The stored document file is missing.');
 
         return $this->response->download($path, null)->setFileName($document['original_filename']);
+    }
+
+    public function preview(int $documentId)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $document = db_connect()->table('application_documents')->where('id', $documentId)->get()->getRowArray();
+        if (! $document) {
+            return $this->response->setStatusCode(404)->setBody('Document not found.');
+        }
+
+        $path = $this->storedDocumentPath($document);
+        if ($path === null || ! is_file($path)) {
+            return $this->response->setStatusCode(404)->setBody('The stored document file is missing.');
+        }
+
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fileInfo->file($path);
+        if (! in_array($mimeType, ['application/pdf', 'image/jpeg', 'image/png'], true)) {
+            return $this->response->setStatusCode(415)->setBody('Preview is not available for this file type.');
+        }
+
+        $extension = match ($mimeType) {
+            'application/pdf' => 'pdf',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+        };
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            log_message('error', 'Could not read application document {documentId} for preview.', ['documentId' => $documentId]);
+            return $this->response->setStatusCode(500)->setBody('The document preview could not be loaded.');
+        }
+
+        return $this->response
+            ->setHeader('Content-Type', $mimeType)
+            ->setHeader('Content-Disposition', 'inline; filename="application-document.' . $extension . '"')
+            ->setHeader('X-Content-Type-Options', 'nosniff')
+            ->setHeader('Cache-Control', 'private, no-store')
+            ->setBody($contents);
+    }
+
+    private function storedDocumentPath(array $document): ?string
+    {
+        $directory = realpath(WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'applications');
+        if ($directory === false) {
+            return null;
+        }
+
+        $path = realpath($directory . DIRECTORY_SEPARATOR . basename((string) $document['file_path']));
+        if ($path === false || ! str_starts_with($path, $directory . DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $path;
     }
 
     private function requireAdmin(): ?RedirectResponse
@@ -123,4 +176,3 @@ class AdminApplications extends BaseController
         return null;
     }
 }
-

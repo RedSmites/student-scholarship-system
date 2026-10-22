@@ -203,6 +203,9 @@ class Home extends BaseController
             foreach ($uploads as $upload) {
                 /** @var UploadedFile $file */
                 $file = $upload['file'];
+                $originalFilename = $file->getClientName();
+                $mimeType = $file->getMimeType();
+                $fileSize = $file->getSize();
                 $storedName = $file->getRandomName();
                 $file->move($directory, $storedName);
                 $storedPath = $directory . DIRECTORY_SEPARATOR . $storedName;
@@ -213,9 +216,9 @@ class Home extends BaseController
                     'requirement_name_snapshot' => $upload['requirement_name'],
                     'file_category' => $upload['category'],
                     'file_path' => $storedName,
-                    'original_filename' => $file->getClientName(),
-                    'mime_type' => $file->getMimeType(),
-                    'file_size' => $file->getSize(),
+                    'original_filename' => $originalFilename,
+                    'mime_type' => $mimeType,
+                    'file_size' => $fileSize,
                     'admin_verified' => 0,
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);

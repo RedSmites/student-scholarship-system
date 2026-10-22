@@ -9,9 +9,7 @@
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="<?= base_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/vendor/aos/aos.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
@@ -19,7 +17,7 @@
 <body>
 <header id="header" class="header d-flex align-items-center sticky-top">
   <div class="container-fluid container-xl position-relative d-flex align-items-center">
-    <i class="mobile-nav-toggle d-xl-none bi bi-list" aria-label="Toggle navigation"></i>
+    <button type="button" class="mobile-nav-toggle d-xl-none" aria-label="Open navigation" aria-expanded="false">☰</button>
     <a href="<?= site_url('/') ?>" class="logo d-flex align-items-center me-auto">
       <img src="<?= base_url('assets/img/municipal-seal-placeholder.svg') ?>" alt="Municipal logo placeholder">
       <h1 class="sitename">Municipal Scholarship</h1>
@@ -27,10 +25,9 @@
     <nav id="navmenu" class="navmenu" aria-label="Main navigation"><ul>
       <li><a href="<?= site_url('/') ?>" class="<?= url_is('/') ? 'active' : '' ?>">Home</a></li>
       <li><a href="<?= site_url('requirements') ?>" class="<?= url_is('requirements') ? 'active' : '' ?>">Requirements</a></li>
-      <?php if (session()->get('user_role') === 'admin'): ?><li><a href="<?= site_url('administrator') ?>">Admin review</a></li><?php endif ?>
+      <?php if (session()->get('user_role') === 'admin'): ?><li><a href="<?= site_url('dashboard') ?>">Admin dashboard</a></li><li><a href="<?= site_url('administrator') ?>">Application review</a></li><?php endif ?>
     </ul></nav>
     <a class="btn-cta" href="<?= site_url('apply') ?>">Apply Now</a>
   </div>
 </header>
 <main class="main">
-
