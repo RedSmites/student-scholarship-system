@@ -26,36 +26,30 @@ class Auth extends BaseController
             'password_confirm' => 'required|matches[password]',
         ];
 
+        $old = [
+            'first_name' => (string) $this->request->getPost('first_name'),
+            'middle_name' => (string) $this->request->getPost('middle_name'),
+            'last_name' => (string) $this->request->getPost('last_name'),
+            'suffix' => (string) $this->request->getPost('suffix'),
+            'email' => (string) $this->request->getPost('email'),
+        ];
+
         if (! $this->validate($rules)) {
-            return view('auth/register', [
-                'validation' => $this->validator,
-                'old' => [
-                    'first_name' => (string) $this->request->getPost('first_name'),
-                    'middle_name' => (string) $this->request->getPost('middle_name'),
-                    'last_name' => (string) $this->request->getPost('last_name'),
-                    'suffix' => (string) $this->request->getPost('suffix'),
-                    'email' => (string) $this->request->getPost('email'),
-                ],
-            ]);
+            return view('auth/register', ['validation' => $this->validator, 'old' => $old]);
         }
 
-        $users = new UserModel();
-
-        $users->insert([
-            'first_name' => trim((string) $this->request->getPost('first_name')),
-            'middle_name' => trim((string) ($this->request->getPost('middle_name') ?? '')) ?: null,
-            'last_name' => trim((string) $this->request->getPost('last_name')),
-            'suffix' => trim((string) ($this->request->getPost('suffix') ?? '')) ?: null,
-            'email' => strtolower(trim((string) $this->request->getPost('email'))),
-            'password_hash' => password_hash(
-                (string) $this->request->getPost('password'),
-                PASSWORD_DEFAULT
-            ),
+        (new UserModel())->insert([
+            'first_name' => trim($old['first_name']),
+            'middle_name' => trim($old['middle_name']) ?: null,
+            'last_name' => trim($old['last_name']),
+            'suffix' => trim($old['suffix']) ?: null,
+            'email' => strtolower(trim($old['email'])),
+            'password_hash' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
             'role' => 'student',
+            'created_at' => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to(site_url('login'))
-            ->with('success', 'Registration successful. You can now log in.');
+        return redirect()->to(site_url('login'))->with('success', 'Account created. Set this account role to admin in the database before signing in.');
     }
 
     public function login()
@@ -90,6 +84,11 @@ class Auth extends BaseController
                 ->with('error', 'Invalid email or password.');
         }
 
+        if ($user['role'] !== 'admin') {
+            return redirect()->to(site_url('login'))
+                ->with('error', 'This sign-in is for administrators. Applicants can apply without an account.');
+        }
+
         // Regenerate the session ID after successful authentication.
         session()->regenerate(true);
 
@@ -100,6 +99,10 @@ class Auth extends BaseController
             'user_role' => $user['role'],
             'isLoggedIn' => true,
         ]);
+
+        if ($user['role'] === 'admin') {
+            return redirect()->to(site_url('administrator'));
+        }
 
         return redirect()->to(site_url('dashboard'));
     }
@@ -112,3 +115,4 @@ class Auth extends BaseController
             ->with('success', 'You have been logged out.');
     }
 }
+

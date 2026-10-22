@@ -10,26 +10,22 @@ $routes->setAutoRoute(false);
 
 // Public homepage
 $routes->get('/', 'Home::index');
-$routes->group('admin', ['filter' => 'admin'], static function ($routes) {
-    $routes->get('/', 'Admin::index');
-    $routes->get('dashboard', 'Admin::index');
-    $routes->get('scholarships', 'Admin::scholarships');
-    $routes->get('scholarships/create', 'Admin::createScholarship');
-    $routes->post('scholarships/store', 'Admin::storeScholarship');
-    $routes->get('scholarships/edit/(:num)', 'Admin::editScholarship/$1');
-    $routes->post('scholarships/update/(:num)', 'Admin::updateScholarship/$1');
-    $routes->post('scholarships/delete/(:num)', 'Admin::deleteScholarship/$1');
-    $routes->get('applications', 'Admin::applications');
-    $routes->post('applications/update-status/(:num)','Admin::updateApplicationStatus/$1');
-    $routes->get('applications/view/(:num)','Admin::viewApplication/$1');
-    $routes->get('students', 'Admin::students');
-});
+$routes->get('requirements', 'Home::requirements');
+$routes->get('apply', 'Home::apply');
+$routes->post('apply', 'Home::submitApplication');
+$routes->get('application/received', 'Home::received');
 
-// Registration
+// Administrator application review (controller enforces the admin role).
+$routes->get('administrator', 'AdminApplications::index');
+$routes->get('administrator/(:num)', 'AdminApplications::show/$1');
+$routes->post('administrator/update/(:num)', 'AdminApplications::update/$1');
+$routes->get('administrator/document/(:num)', 'AdminApplications::download/$1');
+
+// Account registration is available for administrator account setup; new accounts are students.
 $routes->get('register', 'Auth::register');
 $routes->post('register', 'Auth::processRegister');
 
-// Login
+// Administrator login (only admin-role accounts can sign in).
 $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::processLogin');
 

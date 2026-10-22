@@ -8,9 +8,9 @@ class Scholarships extends BaseController
 {
     public function index()
     {
-        if (! session()->get('isLoggedIn')) {
+        if (! session()->get('isLoggedIn') || session()->get('user_role') !== 'admin') {
             return redirect()->to(site_url('login'))
-                ->with('error', 'Please log in to view scholarships.');
+                ->with('error', 'Administrator access is required.');
         }
 
         $today = date('Y-m-d');

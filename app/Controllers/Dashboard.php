@@ -6,10 +6,9 @@ class Dashboard extends BaseController
 {
     public function index()
     {
-        // Prevent access by users who are not logged in.
-        if (! session()->get('isLoggedIn')) {
+        if (! session()->get('isLoggedIn') || session()->get('user_role') !== 'admin') {
             return redirect()->to(site_url('login'))
-                ->with('error', 'Please log in to access the dashboard.');
+                ->with('error', 'Administrator access is required.');
         }
 
         return view('dashboard/index', [

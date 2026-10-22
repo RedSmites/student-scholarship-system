@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Student Login</title>
+    <title>Administrator Sign In</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 </head>
@@ -14,7 +14,8 @@
         <div class="col-md-6 col-lg-5">
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <h1 class="h3 mb-4">Student Login</h1>
+                    <h1 class="h3 mb-2">Administrator Sign In</h1>
+                    <p class="text-muted mb-4">Applicants do not need an account to apply.</p>
 
                     <?php if (session()->getFlashdata('success')): ?>
                         <div class="alert alert-success">
@@ -58,10 +59,8 @@
                         </button>
                     </form>
 
-                    <p class="text-center mt-3 mb-0">
-                        Don't have an account?
-                        <a href="<?= site_url('register') ?>">Register</a>
-                    </p>
+                    <p class="text-center mt-3 mb-0"><a href="<?= site_url('register') ?>">Create an account</a></p>
+                    <p class="text-center mt-2 mb-0"><a href="<?= site_url('/') ?>">Return to the scholarship portal</a></p>
                 </div>
             </div>
         </div>

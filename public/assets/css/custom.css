@@ -1,0 +1,413 @@
+/* ---------------------------------------------------------------
+   Custom additions for the Student Assistance system.
+   Loaded after main.css so it can build on the template's own
+   CSS variables (colors, fonts) without editing the vendor file.
+   --------------------------------------------------------------- */
+
+/* Reusable pill CTA button, usable outside the .hero section
+   (the template's own .btn-get-started only works inside .hero).
+   Flex-centered so the label is always dead-center regardless of
+   font metrics, and both variants share the same border thickness
+   so a solid + outline button pair line up at the same height. */
+.btn-cta,
+.btn-cta-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  padding: 13px 32px;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  transition: 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-cta {
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.btn-cta:hover,
+.btn-cta:focus {
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  color: var(--contrast-color);
+}
+
+.btn-cta:disabled,
+.btn-cta.disabled {
+  background: color-mix(in srgb, var(--default-color), transparent 70%);
+  color: var(--contrast-color);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-cta-outline {
+  background: transparent;
+  color: var(--heading-color);
+  border-color: var(--heading-color);
+}
+
+.btn-cta-outline:hover {
+  background: var(--heading-color);
+  color: var(--contrast-color);
+}
+
+/* Compact sizing when the CTA button sits in the header, next to the nav. */
+.header .btn-cta {
+  font-size: 14px;
+  padding: 9px 25px;
+  margin: 0 0 0 30px;
+}
+
+@media (max-width: 1200px) {
+  .header .btn-cta {
+    order: 3;
+    margin: 0 0 0 15px;
+    padding: 7px 15px;
+  }
+
+  /* Toggle sits first (far left), logo follows it. */
+  .header .mobile-nav-toggle {
+    order: 0;
+    margin: 0 12px 0 0;
+  }
+
+  .header .logo {
+    order: 1;
+  }
+
+  .header .navmenu {
+    order: 2;
+    margin-left: auto;
+  }
+}
+
+/* Required-field asterisk: red instead of inheriting the label's
+   dark color. Use <span class="required-mark">*</span> after the
+   label text instead of typing a plain "*". */
+.required-mark {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+/* Form sections on the assistance request page */
+.form-section-card {
+  background: var(--surface-color);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  border-radius: 12px;
+  padding: 28px 30px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.form-section-card h5 {
+  font-family: var(--heading-font);
+  color: var(--heading-color);
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-section-card h5 i {
+  color: var(--accent-color);
+}
+
+.form-section-card .section-hint {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  margin-bottom: 20px;
+}
+
+.form-section-card .form-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--heading-color);
+}
+
+/* Admin area - simple internal chrome sharing the same visual language,
+   deliberately without the marketing nav/footer. */
+.admin-topbar {
+  background: var(--heading-color);
+  color: var(--contrast-color);
+  padding: 16px 0;
+}
+
+.admin-topbar a {
+  color: var(--contrast-color);
+  text-decoration: none;
+}
+
+.admin-topbar a:hover {
+  opacity: 0.85;
+}
+
+.admin-topbar .brand {
+  font-family: var(--heading-font);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.admin-shell {
+  min-height: 100vh;
+  background: var(--background-color);
+}
+
+.admin-login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-login-card {
+  background: var(--surface-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.admin-card {
+  background: var(--surface-color);
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+}
+
+.admin-stat-card {
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+}
+
+.admin-stat-card h3 {
+  font-family: var(--heading-font);
+  font-weight: 800;
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.admin-stat-card.is-total {
+  background: color-mix(in srgb, var(--accent-color), white 88%);
+}
+
+.admin-stat-card.is-total h3 {
+  color: var(--accent-color);
+}
+
+.admin-stat-card.is-affected {
+  background: #fdecea;
+}
+
+.admin-stat-card.is-affected h3 {
+  color: #dc3545;
+}
+
+.admin-stat-card.is-safe {
+  background: #e9f7ef;
+}
+
+.admin-stat-card.is-safe h3 {
+  color: #198754;
+}
+
+/* Trim the hero section's default top padding (the template ships with
+   180px, which pushes the illustration below the fold on most screens). */
+#hero.hero {
+  min-height: auto;
+  padding: 110px 0 40px 0;
+}
+
+/* Developer profile card (About Us) - styled like the reference project's
+   testimonial cards, but static: no carousel, no star ratings. */
+.developer-card {
+  background: var(--surface-color);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 40px;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.developer-card .developer-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid var(--background-color);
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: 0 auto 16px auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.developer-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--heading-color);
+}
+
+.developer-card h4 {
+  font-size: 13px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  margin: 0 0 16px 0;
+}
+
+.developer-card p {
+  font-style: italic;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+  margin: 0;
+}
+
+/* Developer's school line sits on its own row under the role/program,
+   so drop the italic quote styling the generic paragraph had. */
+.developer-card .developer-school {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  margin: 0;
+}
+
+/* Give the Living Situation / Assistance Needed checkboxes more breathing
+   room - they read as too cramped when packed tight. */
+.checkbox-group .form-check {
+  margin-bottom: 12px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.checkbox-group.row {
+  row-gap: 4px;
+}
+
+/* Inline validation feedback: keep it directly under its field
+   instead of one long list at the top of the form. */
+.invalid-feedback {
+  font-size: 12.5px;
+}
+
+/* The "What This System Is For" section sits directly above the footer -
+   give it a bit more breathing room at the bottom. */
+#about.about.section {
+  padding-bottom: 100px;
+}
+
+/* Descriptive paragraph in the "What This System Is For" column:
+   justified, with generous room on the right (on top of Bootstrap's
+   own column gutter) so the justified edge sits clearly clear of
+   the photo beside it. */
+#about .content p {
+  text-align: justify;
+}
+
+@media (min-width: 992px) {
+  #about .content p {
+    padding-right: 32px;
+  }
+}
+
+/* Footer: with the footer-top block removed, center the remaining
+   copyright content vertically instead of leaving the default
+   top/bottom padding mismatch that pushed it toward the top edge. */
+#footer.footer {
+  padding: 40px 0;
+}
+
+#footer .copyright {
+  padding: 0;
+  border-top: none;
+}
+
+/* Mobile nav menu: anchor it to the left edge as a compact panel sized
+   to its content, instead of the template's default which both stretches
+   almost to the bottom of the viewport and spans the full width. */
+@media (max-width: 1199px) {
+  .navmenu ul {
+    inset: 60px auto auto 12px;
+    right: auto;
+    width: 220px;
+    max-height: calc(100vh - 100px);
+  }
+}
+
+/* Admin submissions table - roomier cell spacing than the Bootstrap
+   default, and a small search/filter toolbar above it. */
+.admin-card table th,
+.admin-card table td {
+  padding: 14px 12px;
+}
+
+.admin-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.admin-filter-bar .filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+
+.admin-filter-bar .filter-controls input[type="search"] {
+  min-width: 220px;
+  flex: 1 1 220px;
+}
+
+.admin-result-count {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+/* Confirmation modal buttons */
+.modal .btn-cta,
+.modal .btn-outline-secondary {
+  min-width: 160px;
+}
+
+/* "Living Situation" / "Assistance Needed" / "Were you affected" group
+   labels - bumped up so they read clearly larger than the checkbox/radio
+   option text sitting under them. */
+.group-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--heading-color);
+}
+
+/* Constrain the "What This System Is For" photo to a sane height - the
+   source image is a tall portrait shot, so left uncapped it renders far
+   taller than the text column next to it. */
+.system-photo {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+}
+
+@media (max-width: 991px) {
+  .system-photo {
+    height: 240px;
+  }
+}
