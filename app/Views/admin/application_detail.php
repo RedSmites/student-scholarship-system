@@ -24,7 +24,7 @@ $detailLabels = [
 ];
 ?>
 <div class="review-page">
-    <a class="review-back-link" href="<?= site_url('administrator') ?>">
+    <a class="review-back-link" href="<?= site_url('administrator/applications') ?>">
         <span aria-hidden="true">&larr;</span> Back to applications
     </a>
 

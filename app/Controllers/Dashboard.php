@@ -7,7 +7,7 @@ class Dashboard extends BaseController
     public function index()
     {
         if (! session()->get('isLoggedIn') || session()->get('user_role') !== 'admin') {
-            return redirect()->to(site_url('login'))
+            return redirect()->to(site_url('administrator'))
                 ->with('error', 'Administrator access is required.');
         }
 

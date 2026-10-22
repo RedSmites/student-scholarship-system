@@ -14,7 +14,7 @@ class AdminFilter implements FilterInterface
 
         // Redirect unauthenticated visitors to the login page.
         if (! $session->get('isLoggedIn')) {
-            return redirect()->to(site_url('login'))
+            return redirect()->to(site_url('administrator'))
                 ->with('error', 'Please log in to access that page.');
         }
 

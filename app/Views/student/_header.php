@@ -25,7 +25,6 @@
     <nav id="navmenu" class="navmenu" aria-label="Main navigation"><ul>
       <li><a href="<?= site_url('/') ?>" class="<?= url_is('/') ? 'active' : '' ?>">Home</a></li>
       <li><a href="<?= site_url('requirements') ?>" class="<?= url_is('requirements') ? 'active' : '' ?>">Requirements</a></li>
-      <?php if (session()->get('user_role') === 'admin'): ?><li><a href="<?= site_url('dashboard') ?>">Admin dashboard</a></li><li><a href="<?= site_url('administrator') ?>">Application review</a></li><?php endif ?>
     </ul></nav>
     <a class="btn-cta" href="<?= site_url('apply') ?>">Apply Now</a>
   </div>

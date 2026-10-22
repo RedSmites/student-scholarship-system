@@ -45,11 +45,11 @@ class Auth extends BaseController
             'suffix' => trim($old['suffix']) ?: null,
             'email' => strtolower(trim($old['email'])),
             'password_hash' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role' => 'student',
+            'role' => 'admin',
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to(site_url('login'))->with('success', 'Account created. Set this account role to admin in the database before signing in.');
+        return redirect()->to(site_url('administrator'))->with('success', 'Administrator account created. You can now sign in.');
     }
 
     public function login()
@@ -79,13 +79,13 @@ class Auth extends BaseController
         $user = $users->where('email', $email)->first();
 
         if (! $user || ! password_verify($password, $user['password_hash'])) {
-            return redirect()->to(site_url('login'))
+            return redirect()->to(site_url('administrator'))
                 ->withInput()
                 ->with('error', 'Invalid email or password.');
         }
 
         if ($user['role'] !== 'admin') {
-            return redirect()->to(site_url('login'))
+            return redirect()->to(site_url('administrator'))
                 ->with('error', 'This sign-in is for administrators. Applicants can apply without an account.');
         }
 
@@ -111,7 +111,7 @@ class Auth extends BaseController
     {
         session()->destroy();
 
-        return redirect()->to(site_url('login'))
+        return redirect()->to(site_url('administrator'))
             ->with('success', 'You have been logged out.');
     }
 }

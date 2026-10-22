@@ -28,7 +28,7 @@ class AdminApplications extends BaseController
             ->select('a.*, s.title AS scholarship_title, s.provider AS scholarship_provider')
             ->join('scholarships s', 's.id = a.scholarship_id')
             ->where('a.id', $id)->get()->getRowArray();
-        if (! $application) return redirect()->to(site_url('administrator'))->with('error', 'Application not found.');
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
 
         $application['details'] = json_decode((string) ($application['application_data'] ?? ''), true) ?: [];
         $application['documents'] = $db->table('application_documents')
@@ -45,7 +45,7 @@ class AdminApplications extends BaseController
 
         $db = db_connect();
         $exists = $db->table('applications')->where('id', $id)->countAllResults() > 0;
-        if (! $exists) return redirect()->to(site_url('administrator'))->with('error', 'Application not found.');
+        if (! $exists) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
 
         $status = (string) $this->request->getPost('status');
         $allowedStatuses = ['pending', 'under_review', 'incomplete', 'approved', 'rejected'];
@@ -103,7 +103,7 @@ class AdminApplications extends BaseController
         if ($redirect = $this->requireAdmin()) return $redirect;
 
         $document = db_connect()->table('application_documents')->where('id', $documentId)->get()->getRowArray();
-        if (! $document) return redirect()->to(site_url('administrator'))->with('error', 'Document not found.');
+        if (! $document) return redirect()->to(site_url('administrator/applications'))->with('error', 'Document not found.');
 
         $path = $this->storedDocumentPath($document);
         if ($path === null || ! is_file($path)) return redirect()->to(site_url('administrator/' . (int) $document['application_id']))->with('error', 'The stored document file is missing.');
@@ -168,7 +168,7 @@ class AdminApplications extends BaseController
     private function requireAdmin(): ?RedirectResponse
     {
         if (! session()->get('isLoggedIn')) {
-            return redirect()->to(site_url('login'))->with('error', 'Please log in with an administrator account.');
+            return redirect()->to(site_url('administrator'))->with('error', 'Please log in with an administrator account.');
         }
         if (session()->get('user_role') !== 'admin') {
             return redirect()->to(site_url('dashboard'))->with('error', 'Administrator access is required.');

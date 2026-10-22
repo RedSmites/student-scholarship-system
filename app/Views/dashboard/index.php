@@ -5,7 +5,7 @@
         <h1 class="h2 mb-1">Welcome, <?= esc($name ?? 'Administrator') ?></h1>
         <p class="text-muted mb-0">A current overview of applications and open scholarship programs.</p>
     </div>
-    <a class="btn btn-primary" href="<?= site_url('administrator') ?>">Review applications</a>
+    <a class="btn btn-primary" href="<?= site_url('administrator/applications') ?>">Review applications</a>
 </div>
 
 <div class="row g-3 mb-4">
@@ -45,7 +45,7 @@
             <h2 class="h5 mb-1">Recent applications</h2>
             <p class="small text-muted mb-0">The latest submissions from the student application portal.</p>
         </div>
-        <a class="btn btn-sm btn-outline-primary" href="<?= site_url('administrator') ?>">View all applications</a>
+        <a class="btn btn-sm btn-outline-primary" href="<?= site_url('administrator/applications') ?>">View all applications</a>
     </div>
 
     <?php if (empty($recentApplications)): ?>

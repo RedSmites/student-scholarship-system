@@ -66,18 +66,46 @@ class Home extends BaseController
             'scholarship_id' => 'required|is_natural_no_zero',
             'last_name' => 'required|max_length[100]', 'first_name' => 'required|max_length[100]',
             'middle_name' => 'permit_empty|max_length[100]', 'date_of_birth' => 'required|valid_date',
-            'mailing_address' => 'required|max_length[255]', 'place_of_birth' => 'required|max_length[150]',
-            'sex' => 'required|in_list[Male,Female]', 'zip_code' => 'required|max_length[10]',
-            'civil_status' => 'required|in_list[Single,Married]', 'school_name' => 'required|max_length[180]',
-            'school_address' => 'required|max_length[255]', 'citizenship' => 'required|max_length[100]',
-            'school_type' => 'required|in_list[Public,Private]', 'mobile_number' => 'required|max_length[30]',
-            'highest_grade' => 'required|max_length[80]', 'email' => 'required|valid_email|max_length[190]',
+            'place_of_birth' => 'required|max_length[150]',
+            'sex' => 'required|in_list[Male,Female]',
+            'civil_status' => 'required|in_list[Single,Married,Widowed,Separated]',
+            'citizenship' => 'required|max_length[100]', 'religion' => 'required|max_length[100]',
+            'barangay' => 'required|in_list[Baldios,Botbotones,Caanamongan,Cabaruan,Cabugbugan,Caduldulaoan,Calipayan,Macaguing,Nambalan,Padapada,Pilpila,Pinpinas,Poblacion East (Urban),Poblacion West (Urban),Pugo-Cecilio,San Francisco,San Sotero,San Vicente,Santa Ines Centro,Santa Ines East,Santa Ines West,Taguiporo,Timmaguab,Vargas]',
+            'street' => 'required|max_length[150]', 'house_number' => 'permit_empty|max_length[80]',
+            'mobile_number' => 'required|max_length[11]|regex_match[/^09[0-9]{9}$/]',
+            'email' => 'required|valid_email|max_length[190]',
+            'facebook_link' => 'permit_empty|valid_url|max_length[255]',
+            'academic_level' => 'required|in_list[Senior High,College Level]',
+            'school_name' => 'required|max_length[180]',
+            'school_street' => 'required|max_length[150]', 'school_barangay' => 'required|max_length[120]',
+            'school_municipality' => 'required|max_length[120]', 'school_province' => 'required|max_length[120]',
+            'school_type' => 'required|in_list[Public,Private]',
             'father_status' => 'required|in_list[Living,Deceased]', 'mother_status' => 'required|in_list[Living,Deceased]',
-            'parents_income' => 'required|numeric', 'siblings' => 'required|is_natural',
-            'intended_school' => 'required|max_length[180]', 'intended_school_address' => 'required|max_length[255]',
-            'intended_school_type' => 'required|in_list[Public,Private]', 'course' => 'required|max_length[180]',
+            'father_contact_number' => 'permit_empty|max_length[15]|regex_match[/^[0-9]{7,15}$/]',
+            'mother_contact_number' => 'permit_empty|max_length[15]|regex_match[/^[0-9]{7,15}$/]',
+            'guardian_contact_number' => 'permit_empty|max_length[15]|regex_match[/^[0-9]{7,15}$/]',
+            'guardian_monthly_income' => 'permit_empty|numeric|greater_than_equal_to[0]',
+            'parents_income' => 'required|numeric|greater_than_equal_to[0]',
+            'intended_school' => 'permit_empty|max_length[180]',
+            'intended_school_street' => 'permit_empty|max_length[150]', 'intended_school_barangay' => 'permit_empty|max_length[120]',
+            'intended_school_municipality' => 'permit_empty|max_length[120]', 'intended_school_province' => 'permit_empty|max_length[120]',
+            'intended_school_type' => 'permit_empty|in_list[Public,Private]', 'course' => 'required|max_length[180]',
             'declaration' => 'required|in_list[yes]',
         ];
+        foreach (['father', 'mother', 'guardian'] as $familyMember) {
+            foreach (['last_name', 'first_name', 'middle_name'] as $namePart) {
+                $requiredName = $familyMember !== 'guardian' && in_array($namePart, ['last_name', 'first_name'], true);
+                $rules[$familyMember . '_' . $namePart] = ($requiredName ? 'required' : 'permit_empty') . '|max_length[100]';
+            }
+        }
+        if ($this->request->getPost('academic_level') === 'Senior High') {
+            $rules['intended_school'] = 'required|max_length[180]';
+            $rules['intended_school_street'] = 'required|max_length[150]';
+            $rules['intended_school_barangay'] = 'required|max_length[120]';
+            $rules['intended_school_municipality'] = 'required|max_length[120]';
+            $rules['intended_school_province'] = 'required|max_length[120]';
+            $rules['intended_school_type'] = 'required|in_list[Public,Private]';
+        }
         if (! $this->validate($rules)) {
             session()->setFlashdata('old_application', $oldApplication);
             return redirect()->to(site_url('apply'))->with('form_errors', $this->validator->getErrors());
@@ -130,19 +158,23 @@ class Home extends BaseController
             return redirect()->to(site_url('apply'))->with('error', 'Applicant photo must be 5 MB or smaller.');
         }
 
-        $signature = $this->request->getFile('signature_image');
-        if (! $signature || ! $signature->isValid() || ! in_array($signature->getMimeType(), ['image/jpeg', 'image/png'], true)) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Attach your signature as a valid JPG or PNG image.');
-        }
-        if ($signature->getSizeByUnit('mb') > 5) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Signature image must be 5 MB or smaller.');
+        $signatureUploads = [];
+        foreach (['applicant' => 'Applicant', 'parent' => 'Parent'] as $key => $label) {
+            $signature = $this->request->getFile('signature_' . $key);
+            if (! $signature || ! $signature->isValid() || ! in_array($signature->getMimeType(), ['image/jpeg', 'image/png'], true)) {
+                session()->setFlashdata('old_application', $oldApplication);
+                return redirect()->to(site_url('apply'))->with('error', 'Attach a valid JPG or PNG signature image for ' . $label . '.');
+            }
+            if ($signature->getSizeByUnit('mb') > 5) {
+                session()->setFlashdata('old_application', $oldApplication);
+                return redirect()->to(site_url('apply'))->with('error', 'Each signature image must be 5 MB or smaller.');
+            }
+            $signatureUploads[] = ['file' => $signature, 'category' => 'signature_' . $key, 'requirement_id' => null, 'requirement_name' => $label . ' signature'];
         }
         $uploads = [
             ['file' => $photo, 'category' => 'applicant_photo', 'requirement_id' => null, 'requirement_name' => 'Applicant photo'],
-            ['file' => $signature, 'category' => 'signature', 'requirement_id' => null, 'requirement_name' => 'Applicant signature'],
         ];
+        $uploads = array_merge($uploads, $signatureUploads);
         foreach ($documentNames as $document) {
             $uploads[] = [
                 'file' => $document['file_name'],
@@ -157,6 +189,18 @@ class Home extends BaseController
 
         $post = $this->request->getPost();
         unset($post[csrf_token()]);
+        try {
+            $birthDate = new \DateTimeImmutable($post['date_of_birth']);
+            $today = new \DateTimeImmutable('today');
+            if ($birthDate > $today) {
+                session()->setFlashdata('old_application', $oldApplication);
+                return redirect()->to(site_url('apply'))->with('error', 'Date of birth cannot be in the future.');
+            }
+            $post['age'] = $birthDate->diff($today)->y;
+        } catch (\Throwable $e) {
+            session()->setFlashdata('old_application', $oldApplication);
+            return redirect()->to(site_url('apply'))->with('error', 'Enter a valid date of birth.');
+        }
         $applicantName = trim($post['last_name'] . ', ' . $post['first_name'] . ' ' . ($post['middle_name'] ?? ''));
         $directory = WRITEPATH . 'uploads/applications';
         if (! is_dir($directory) && ! mkdir($directory, 0750, true) && ! is_dir($directory)) {

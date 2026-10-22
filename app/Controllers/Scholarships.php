@@ -354,7 +354,7 @@ class Scholarships extends BaseController
     private function requireAdmin(): ?RedirectResponse
     {
         if (! session()->get('isLoggedIn')) {
-            return redirect()->to(site_url('login'))
+            return redirect()->to(site_url('administrator'))
                 ->with('error', 'Please log in with an administrator account.');
         }
         if (session()->get('user_role') !== 'admin') {

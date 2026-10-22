@@ -14,21 +14,24 @@ $routes->get('apply', 'Home::apply');
 $routes->post('apply', 'Home::submitApplication');
 $routes->get('application/received', 'Home::received');
 
-// Administrator application review (controller enforces the admin role).
-$routes->get('administrator', 'AdminApplications::index');
+// Administrator sign in and registration.
+$routes->get('administrator', 'Auth::login');
+$routes->post('administrator', 'Auth::processLogin');
+$routes->get('administrator/register', 'Auth::register');
+$routes->post('administrator/register', 'Auth::processRegister');
+$routes->get('administrator/settings', 'AdminSettings::index');
+$routes->post('administrator/settings', 'AdminSettings::update');
+
+// Legacy URLs redirect to the administrator paths.
+$routes->get('login', static fn () => redirect()->to(site_url('administrator')));
+$routes->get('register', static fn () => redirect()->to(site_url('administrator/register')));
+
+// Protected administrator application review.
+$routes->get('administrator/applications', 'AdminApplications::index');
 $routes->get('administrator/(:num)', 'AdminApplications::show/$1');
 $routes->post('administrator/update/(:num)', 'AdminApplications::update/$1');
 $routes->get('administrator/document/(:num)', 'AdminApplications::download/$1');
 $routes->get('administrator/document/(:num)/preview', 'AdminApplications::preview/$1');
-
-// Account registration is available for administrator account setup; new accounts are students.
-$routes->get('register', 'Auth::register');
-$routes->post('register', 'Auth::processRegister');
-
-// Administrator login (only admin-role accounts can sign in).
-$routes->get('login', 'Auth::login');
-$routes->post('login', 'Auth::processLogin');
-
 // Logout
 $routes->post('logout', 'Auth::logout');
 
