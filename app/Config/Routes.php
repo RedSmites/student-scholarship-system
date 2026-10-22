@@ -22,6 +22,7 @@ $routes->group('admin', ['filter' => 'admin'], static function ($routes) {
     $routes->get('applications', 'Admin::applications');
     $routes->post('applications/update-status/(:num)','Admin::updateApplicationStatus/$1');
     $routes->get('applications/view/(:num)','Admin::viewApplication/$1');
+    $routes->get('students', 'Admin::students');
 });
 
 // Registration

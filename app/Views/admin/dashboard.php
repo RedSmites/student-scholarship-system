@@ -1,4 +1,4 @@
-
+```php
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,6 +70,10 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
+        section[id] {
+            scroll-margin-top: 20px;
+        }
+
         @media (max-width: 767px) {
             .sidebar {
                 min-height: auto;
@@ -92,24 +96,24 @@
                 🎓 Scholarship System
             </div>
 
-            <nav>
+            <nav aria-label="Admin navigation">
                 <a href="<?= site_url('admin/dashboard') ?>" class="active">
                     🏠 Dashboard
                 </a>
 
-                <a href="#overview">
+                <a href="<?= site_url('admin/dashboard') ?>#overview">
                     📊 Overview
                 </a>
 
-                <a href="#scholarships">
+                <a href="<?= site_url('admin/scholarships') ?>">
                     🎓 Scholarships
                 </a>
 
-                <a href="#applications">
+                <a href="<?= site_url('admin/applications') ?>">
                     📄 Applications
                 </a>
 
-                <a href="#users">
+                <a href="<?= site_url('admin/students') ?>">
                     👥 Students
                 </a>
 
@@ -118,6 +122,15 @@
                 <a href="<?= site_url('/') ?>">
                     🌐 Visit Website
                 </a>
+
+                <form action="<?= site_url('logout') ?>" method="post" class="mt-3">
+                    <?= csrf_field() ?>
+
+                    <button type="submit"
+                            class="btn btn-outline-light w-100 text-start">
+                        🚪 Logout
+                    </button>
+                </form>
             </nav>
         </aside>
 
@@ -131,7 +144,7 @@
                     <h2 class="fw-bold mb-1">Admin Dashboard</h2>
                     <p class="text-secondary mb-0">
                         Welcome back,
-                        <?= esc(session()->get('user_name')) ?>!
+                        <?= esc(session()->get('user_name') ?? 'Administrator') ?>!
                     </p>
                 </div>
 
@@ -141,10 +154,10 @@
             </div>
 
             <!-- Summary Cards -->
-            <section id="overview">
+            <section id="overview" class="mb-4">
                 <h5 class="fw-bold mb-3">System Overview</h5>
 
-                <div class="row g-3 mb-4">
+                <div class="row g-3">
 
                     <div class="col-sm-6 col-xl-3">
                         <div class="card dashboard-card">
@@ -205,7 +218,7 @@
                 </div>
             </section>
 
-            <!-- Application Summary -->
+            <!-- Application Monitoring -->
             <section id="applications" class="mb-4">
                 <div class="card section-card">
                     <div class="card-body p-4">
@@ -224,56 +237,69 @@
                                 <?= esc($pendingApplications) ?>
                             </div>
                         </div>
+
+                        <a href="<?= site_url('admin/applications') ?>"
+                           class="btn btn-outline-primary btn-sm mt-3">
+                            Review Applications
+                        </a>
                     </div>
                 </div>
             </section>
 
-            <!-- Quick Actions -->
+            <!-- Quick Access -->
             <section class="mb-4">
                 <h5 class="fw-bold mb-3">Quick Access</h5>
 
                 <div class="row g-3">
 
-                    <div class="col-md-4" id="scholarships">
-                        <div class="card section-card">
+                    <!-- Scholarships -->
+                    <div class="col-md-4">
+                        <div class="card section-card h-100">
                             <div class="card-body p-4">
                                 <h5>🎓 Scholarships</h5>
+
                                 <p class="text-secondary">
-                                    View scholarship listings on the website.
+                                    Create, update, and manage scholarship listings.
                                 </p>
-                                <a href="<?= site_url('/') ?>"
+
+                                <a href="<?= site_url('admin/scholarships') ?>"
                                    class="btn btn-primary">
-                                    View Website
+                                    Manage Scholarships
                                 </a>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Applications -->
                     <div class="col-md-4">
-                        <div class="card section-card">
+                        <div class="card section-card h-100">
                             <div class="card-body p-4">
                                 <h5>📄 Applications</h5>
+
                                 <p class="text-secondary">
-                                    Monitor the total and pending applications.
+                                    Review applications and update their status.
                                 </p>
-                                <a href="#applications"
+
+                                <a href="<?= site_url('admin/applications') ?>"
                                    class="btn btn-outline-primary">
-                                    View Summary
+                                    Manage Applications
                                 </a>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Students -->
                     <div class="col-md-4" id="users">
-                        <div class="card section-card">
+                        <div class="card section-card h-100">
                             <div class="card-body p-4">
                                 <h5>👥 Students</h5>
+
                                 <p class="text-secondary">
-                                    Check the number of registered students.
+                                    View the total number of registered student accounts.
                                 </p>
-                                <a href="#overview"
-                                   class="btn btn-outline-primary">
-                                    View Summary
+
+                                <a href="<?= site_url('admin/students') ?>"class="btn btn-outline-primary">
+                                    Manage Students
                                 </a>
                             </div>
                         </div>
@@ -289,5 +315,7 @@
         </main>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

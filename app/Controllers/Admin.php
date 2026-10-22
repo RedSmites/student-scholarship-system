@@ -311,4 +311,41 @@ class Admin extends BaseController
         ]);
     }
 
+    
+    public function students()
+    {
+        $search = trim((string) $this->request->getGet('q'));
+
+        // Limit the search input length.
+        $search = mb_substr($search, 0, 100);
+
+        $db = \Config\Database::connect();
+
+        // Select only the fields needed for the student listing.
+        $builder = $db->table('users')
+            ->select('id, first_name, middle_name, last_name, email')
+            ->where('role', 'student');
+
+        if ($search !== '') {
+            $builder->groupStart()
+                ->like('first_name', $search)
+                ->orLike('middle_name', $search)
+                ->orLike('last_name', $search)
+                ->orLike('email', $search)
+                ->groupEnd();
+        }
+
+        $students = $builder
+            ->orderBy('last_name', 'ASC')
+            ->orderBy('first_name', 'ASC')
+            ->limit(100)
+            ->get()
+            ->getResultArray();
+
+        return view('admin/students', [
+            'students' => $students,
+            'search'   => $search,
+        ]);
+    }
+
 }
