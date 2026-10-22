@@ -35,6 +35,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'admin' => \App\Filters\AdminFilter::class,
+        'appheaders' => \App\Filters\SecurityHeaders::class,
     ];
 
     /**
@@ -58,7 +59,7 @@ class Filters extends BaseFilters
         'after' => [
             'pagecache',   // Web Page Caching
             'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar
+            
         ],
     ];
 
@@ -79,7 +80,8 @@ class Filters extends BaseFilters
         ],
         'after' => [
             // 'honeypot',
-            // 'secureheaders',
+            'secureheaders',
+            'appheaders',
         ],
     ];
 
