@@ -6,9 +6,10 @@ use CodeIgniter\Model;
 
 class ScholarshipModel extends Model
 {
-    protected $table = 'scholarships';
-    protected $primaryKey = 'id';
-    protected $returnType = 'array';
+    protected $table            = 'scholarships';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
 
     protected $allowedFields = [
         'title',
@@ -20,5 +21,7 @@ class ScholarshipModel extends Model
         'status',
     ];
 
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
 }
