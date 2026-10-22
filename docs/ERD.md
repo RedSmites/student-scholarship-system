@@ -13,68 +13,68 @@ erDiagram
     SCHOLARSHIP_REQUIREMENTS o|--o{ APPLICATION_DOCUMENTS : identifies
 
     USERS {
-        int id PK
-        varchar first_name
-        varchar middle_name
-        varchar last_name
-        varchar suffix
-        varchar email
-        varchar password_hash
-        varchar role
-        datetime created_at
-        datetime updated_at
+        id PK
+        first_name
+        middle_name
+        last_name
+        suffix
+        email
+        password_hash
+        role
+        created_at
+        updated_at
     }
 
     SCHOLARSHIPS {
-        int id PK
-        varchar title
-        varchar provider
-        text description
-        text eligibility
-        text benefits
-        date deadline
-        varchar status
+        id PK
+        title
+        provider
+        description
+        eligibility
+        benefits
+        deadline
+        status
     }
 
     SCHOLARSHIP_REQUIREMENTS {
-        int id PK
-        int scholarship_id FK
-        varchar requirement_name
-        text description
-        boolean is_required
-        boolean is_active
-        datetime created_at
-        datetime updated_at
+        id PK
+        scholarship_id FK
+        requirement_name
+        description
+        is_required
+        is_active
+        created_at
+        updated_at
     }
 
     APPLICATIONS {
-        int id PK
-        int user_id FK "nullable for public applications"
-        int scholarship_id FK
-        varchar applicant_name
-        varchar email
-        varchar mobile_number
-        longtext application_data
-        varchar status
-        text admin_remarks
-        datetime created_at
-        datetime updated_at
+        id PK
+        user_id FK "nullable for public applications"
+        scholarship_id FK
+        applicant_name
+        email
+        mobile_number
+        application_data
+        status
+        admin_remarks
+        created_at
+        updated_at
     }
 
     APPLICATION_DOCUMENTS {
-        int id PK
-        int application_id FK
-        int requirement_id FK "nullable"
-        varchar requirement_name_snapshot
-        varchar file_category
-        varchar file_path
-        varchar original_filename
-        varchar mime_type
-        int file_size
-        boolean admin_verified
-        text admin_remarks
-        datetime created_at
-        datetime updated_at
+        id PK
+        application_id FK
+        requirement_id FK "nullable"
+        requirement_name_snapshot
+        file_category
+        file_path
+        original_filename
+        mime_type
+        file_size
+        admin_verified
+        admin_remarks
+        created_at
+        updated_at
     }
 ```
 
