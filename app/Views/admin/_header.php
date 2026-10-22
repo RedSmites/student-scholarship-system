@@ -16,7 +16,7 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/css/admin-review.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/admin-review.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/admin-review.css') ?>" rel="stylesheet">
 </head>
 <body class="admin-shell-page">
 <div class="admin-shell">

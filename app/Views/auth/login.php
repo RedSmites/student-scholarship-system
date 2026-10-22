@@ -1,19 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Administrator Login | Municipal Scholarship</title>
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
-=======
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Administrator Sign In</title>
-    <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
->>>>>>> 06a59cbe467985b9066497ce222b50e461966c1b
 </head>
 <body class="admin-auth-page">
 <main class="admin-auth-wrap">
