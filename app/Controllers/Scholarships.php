@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\ApplicationReportPdf;
 use App\Models\ScholarshipModel;
 use App\Models\ScholarshipRequirementModel;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -49,6 +50,63 @@ class Scholarships extends BaseController
             'scholarships' => $scholarships,
             'filters' => ['search' => $search, 'status' => $status],
         ]);
+    }
+
+    public function print(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
+        $record = $this->getPrintRecord($id);
+        if ($record === null) {
+            return redirect()->to(site_url('scholarships'))->with('error', 'Scholarship not found.');
+        }
+
+        return view('scholarships/print', $record);
+    }
+
+    public function downloadPdf(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
+        $record = $this->getPrintRecord($id);
+        if ($record === null) {
+            return redirect()->to(site_url('scholarships'))->with('error', 'Scholarship not found.');
+        }
+
+        $pdf = (new ApplicationReportPdf())->renderScholarship($record['scholarship'], $record['requirements'], [
+            'generated_at' => date('F j, Y g:i A'),
+            'logo_path' => FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'sta_ignacia_logo.png',
+        ]);
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="scholarship-' . $id . '.pdf"')
+            ->setHeader('Content-Length', (string) strlen($pdf))
+            ->setBody($pdf);
+    }
+
+    /**
+     * @return array{scholarship: array, requirements: array}|null
+     */
+    private function getPrintRecord(int $id): ?array
+    {
+        $scholarship = (new ScholarshipModel())->find($id);
+        if (! $scholarship) {
+            return null;
+        }
+
+        $requirements = (new ScholarshipRequirementModel())
+            ->where('scholarship_id', $id)
+            ->where('is_active', 1)
+            ->orderBy('id', 'ASC')
+            ->findAll();
+
+        return ['scholarship' => $scholarship, 'requirements' => $requirements];
     }
 
     public function newForm()

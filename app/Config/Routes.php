@@ -53,6 +53,8 @@ $routes->group('scholarships', ['filter' => 'admin'], static function (RouteColl
     $routes->get('/', 'Scholarships::index');
     $routes->get('new', 'Scholarships::newForm');
     $routes->post('/', 'Scholarships::create');
+    $routes->get('(:num)/print', 'Scholarships::print/$1');
+    $routes->get('(:num)/pdf', 'Scholarships::downloadPdf/$1');
     $routes->get('(:num)/edit', 'Scholarships::edit/$1');
     $routes->post('(:num)', 'Scholarships::update/$1');
     $routes->post('(:num)/delete', 'Scholarships::delete/$1');

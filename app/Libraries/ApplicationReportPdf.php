@@ -77,6 +77,115 @@ class ApplicationReportPdf
         return $this->buildPdf($pages, $logo);
     }
 
+    public function renderScholarship(array $scholarship, array $requirements, array $metadata): string
+    {
+        $pages = [];
+        $pageNumber = 1;
+        $pageContent = '';
+        $y = 0;
+
+        $startPage = function () use (&$pageContent, &$y, &$pageNumber): void {
+            $pageContent = "q 38 0 0 38 28 856 cm /Logo Do Q\n";
+            $pageContent .= $this->text(72, 883, 'MUNICIPALITY OF SANTA IGNACIA', 11, 'F2', [.12, .25, .28]);
+            $pageContent .= $this->text(72, 868, 'MUNICIPAL SCHOLARSHIP PROGRAM', 8, 'F1', [.36, .45, .47]);
+            $pageContent .= $this->text(468, 883, 'PROGRAM RECORD', 7, 'F2', [.24, .39, .41]);
+            $pageContent .= $this->line(self::LEFT, 848, self::LEFT + self::TABLE_WIDTH, 848, [.20, .43, .45], 1.5);
+            $pageContent .= $this->text(self::LEFT, 820, 'SCHOLARSHIP PROGRAM RECORD', 15, 'F2', [.12, .24, .27]);
+            $pageContent .= $this->text(self::LEFT, 802, 'Program details and application requirements', 8, 'F1', [.43, .51, .53]);
+            $pageContent .= $this->line(self::LEFT, 53, self::LEFT + self::TABLE_WIDTH, 53, [.72, .78, .79]);
+            $pageContent .= $this->text(self::LEFT, 39, 'MUNICIPAL SCHOLARSHIP SYSTEM  |  ADMINISTRATIVE COPY', 7, 'F2', [.37, .47, .49]);
+            $pageContent .= $this->text(480, 39, 'PAGE ' . $pageNumber, 7, 'F2', [.37, .47, .49]);
+            $y = 778;
+        };
+
+        $newPage = function () use (&$pages, &$pageContent, &$pageNumber, $startPage): void {
+            if ($pageContent !== '') {
+                $pages[] = $pageContent;
+                $pageNumber++;
+            }
+            $startPage();
+        };
+
+        $section = function (string $title) use (&$pageContent, &$y, $newPage): void {
+            if ($y < 112) {
+                $newPage();
+            }
+            $pageContent .= $this->text(self::LEFT, $y, strtoupper($title), 9, 'F2', [.19, .34, .37]);
+            $pageContent .= $this->line(self::LEFT, $y - 5, self::LEFT + self::TABLE_WIDTH, $y - 5, [.72, .78, .79]);
+            $y -= 18;
+        };
+
+        $row = function (string $label, string $value) use (&$pageContent, &$y, $newPage): void {
+            $lines = $this->wrap($value !== '' ? $value : 'Not provided', 530, 9);
+            $isContinuation = false;
+            while ($lines !== []) {
+                $availableLines = (int) floor(($y - 88) / 11) - 2;
+                if ($availableLines < 1) {
+                    $newPage();
+                    $availableLines = (int) floor(($y - 88) / 11) - 2;
+                }
+                $chunk = array_splice($lines, 0, $availableLines);
+                $rowHeight = 22 + (count($chunk) * 11);
+                $pageContent .= $this->rect(self::LEFT, $y - $rowHeight, self::TABLE_WIDTH, $rowHeight, [.975, .984, .984], [.82, .86, .87]);
+                $pageContent .= $this->text(self::LEFT + 8, $y - 13, $isContinuation ? $label . ' (continued)' : $label, 7, 'F2', [.43, .51, .53]);
+                foreach ($chunk as $index => $line) {
+                    $pageContent .= $this->text(self::LEFT + 8, $y - 25 - ($index * 11), $line, 9, 'F1', [.20, .31, .33]);
+                }
+                $y -= $rowHeight + 5;
+                $isContinuation = true;
+                if ($lines !== []) {
+                    $newPage();
+                }
+            }
+        };
+
+        $startPage();
+        $section('Program details');
+        $row('Scholarship', (string) ($scholarship['title'] ?? ''));
+        $row('Provider', (string) ($scholarship['provider'] ?? ''));
+        $status = (string) ($scholarship['status'] ?? 'closed');
+        if ($status === 'open' && ! empty($scholarship['deadline']) && $scholarship['deadline'] < date('Y-m-d')) {
+            $status = 'expired';
+        }
+        $row('Status', ucwords($status));
+        $row('Application deadline', ! empty($scholarship['deadline']) ? (string) $scholarship['deadline'] : 'No deadline');
+        $row('Program added', (string) ($scholarship['created_at'] ?? ''));
+
+        foreach ([
+            'Program description' => 'description',
+            'Eligibility' => 'eligibility',
+            'Benefits' => 'benefits',
+        ] as $label => $field) {
+            $value = trim((string) ($scholarship[$field] ?? ''));
+            if ($value !== '') {
+                $section($label);
+                $row($label, $value);
+            }
+        }
+
+        $section('Application requirements');
+        if ($requirements === []) {
+            $row('Requirements', 'No active document requirements are configured for this scholarship.');
+        } else {
+            foreach ($requirements as $requirement) {
+                $label = trim((string) ($requirement['requirement_name'] ?? 'Requirement'));
+                $label .= ! empty($requirement['is_required']) ? ' - Required' : ' - Optional';
+                $description = trim((string) ($requirement['description'] ?? ''));
+                $row($label, $description !== '' ? $description : 'No additional instructions provided.');
+            }
+        }
+
+        if ($y < 95) {
+            $newPage();
+        }
+        $pageContent .= $this->text(self::LEFT, $y - 4, 'Generated ' . (string) ($metadata['generated_at'] ?? ''), 7, 'F1', [.43, .51, .53]);
+        $pages[] = $pageContent;
+
+        $logo = isset($metadata['logo_path']) ? $this->loadPngLogo((string) $metadata['logo_path']) : null;
+
+        return $this->buildPdf($pages, $logo);
+    }
+
     private function startPage(array $metadata, int $pageNumber): array
     {
         $content = '';
