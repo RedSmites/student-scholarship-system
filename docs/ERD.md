@@ -1,16 +1,14 @@
-# Entity Relationship Diagram (ERD)
+# Student Scholarship Information System — ERD
 
-This ERD documents the existing Student Scholarship Information System database structure based on the repository's models and migrations. It is documentation only; it does **not** change the database schema.
-
-## ERD
+This ERD shows primary keys (PK), foreign keys (FK), and verb-based relationships. **Data types are intentionally omitted from the diagram.** It documents the system and does not change the database schema.
 
 ```mermaid
 erDiagram
-    USERS o|--o{ APPLICATIONS : submits
-    SCHOLARSHIPS ||--o{ APPLICATIONS : receives
-    SCHOLARSHIPS ||--o{ SCHOLARSHIP_REQUIREMENTS : defines
-    APPLICATIONS ||--o{ APPLICATION_DOCUMENTS : includes
-    SCHOLARSHIP_REQUIREMENTS o|--o{ APPLICATION_DOCUMENTS : identifies
+    USERS o|--o{ APPLICATIONS : "submits"
+    SCHOLARSHIPS ||--o{ APPLICATIONS : "receives"
+    SCHOLARSHIPS ||--o{ SCHOLARSHIP_REQUIREMENTS : "defines"
+    APPLICATIONS ||--o{ APPLICATION_DOCUMENTS : "includes"
+    SCHOLARSHIP_REQUIREMENTS o|--o{ APPLICATION_DOCUMENTS : "is referenced by"
 
     USERS {
         id PK
@@ -49,7 +47,7 @@ erDiagram
 
     APPLICATIONS {
         id PK
-        user_id FK "nullable for public applications"
+        user_id FK
         scholarship_id FK
         applicant_name
         email
@@ -64,7 +62,7 @@ erDiagram
     APPLICATION_DOCUMENTS {
         id PK
         application_id FK
-        requirement_id FK "nullable"
+        requirement_id FK
         requirement_name_snapshot
         file_category
         file_path
@@ -78,16 +76,14 @@ erDiagram
     }
 ```
 
-## Relationship summary
+## Relationship meanings
 
-- **Users → Applications:** A registered user may submit multiple applications. `applications.user_id` can be `NULL` for public applications.
-- **Scholarships → Applications:** Each application is for one scholarship; a scholarship can receive many applications.
-- **Scholarships → Scholarship Requirements:** A scholarship can define multiple requirements.
-- **Applications → Application Documents:** An application can include multiple uploaded documents. Deleting an application cascades to its documents.
-- **Scholarship Requirements → Application Documents:** A document may refer to a requirement. The requirement reference can be `NULL`; the document also stores a requirement-name snapshot.
+- **USERS — submits → APPLICATIONS:** A registered user can submit many applications. `applications.user_id` may be empty for public applications.
+- **SCHOLARSHIPS — receives → APPLICATIONS:** Each application is for one scholarship; a scholarship can receive many applications.
+- **SCHOLARSHIPS — defines → SCHOLARSHIP_REQUIREMENTS:** A scholarship can define multiple requirements.
+- **APPLICATIONS — includes → APPLICATION_DOCUMENTS:** An application can include multiple uploaded documents.
+- **SCHOLARSHIP_REQUIREMENTS — is referenced by → APPLICATION_DOCUMENTS:** A document may refer to a requirement; `requirement_id` may be empty.
 
-## Notes
+**PK** = Primary Key. **FK** = Foreign Key.
 
-- The diagram is intended to describe the existing application, not propose a new schema.
-- Some column types and foreign-key details should be verified against the actual `scholarship_system` database export before using this as a final database specification.
-- The separate `scholarship_applications` table appears in a migration as an alternate/legacy-style application table. The current application controllers use `applications`, so it is not included in the main ERD.
+The companion `docs/drawdb_erd.sql` file is for importing the schema into DrawDB. SQL imports need column definitions to construct tables, but the diagram itself can be displayed without data types. This ERD documentation intentionally omits all data types.
