@@ -6,15 +6,13 @@
   <title><?= esc($title ?? 'Municipal Scholarship Program') ?></title>
   <meta name="description" content="Municipal Scholarship Program student application portal">
   <link href="<?= base_url('assets/img/sta_ignacia_logo.png') ?>" rel="icon" type="image/png">
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="<?= base_url('assets/css/fonts.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/css/student-home.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/student-home.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/student-home.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/student-home.css'), 0, 8) ?>" rel="stylesheet">
 </head>
 <body>
 <header id="header" class="header d-flex align-items-center sticky-top">

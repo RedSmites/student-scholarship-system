@@ -17,5 +17,5 @@
   </div>
 </div>
 <script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/admin.js') ?>?v=<?= filemtime(FCPATH . 'assets/js/admin.js') ?>"></script>
+<script src="<?= base_url('assets/js/admin.js') ?>?v=<?= substr(md5_file(FCPATH . 'assets/js/admin.js'), 0, 8) ?>"></script>
 </body></html>

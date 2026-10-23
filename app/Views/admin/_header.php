@@ -17,8 +17,8 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/css/admin-review.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/admin-review.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/css/admin-pages.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/admin-pages.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/admin-review.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/admin-review.css'), 0, 8) ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/admin-pages.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/admin-pages.css'), 0, 8) ?>" rel="stylesheet">
 </head>
 <body class="admin-shell-page">
 <div class="admin-shell">
