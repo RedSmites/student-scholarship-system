@@ -1,0 +1,188 @@
+.admin-brand-mark {
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+}
+
+.admin-brand-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.admin-page-eyebrow {
+    margin: 0 0 5px;
+    color: var(--accent-color, #317e92);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.admin-page-title {
+    margin: 0 0 5px;
+    color: #334e57;
+    font-size: 25px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.admin-page-description {
+    margin: 0;
+    color: #7b8b90;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.admin-section-title {
+    margin: 0 0 4px;
+    color: #334e57;
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.admin-review-shell .table {
+    color: #50676d;
+    font-size: 12px;
+}
+
+.admin-review-shell .table thead th {
+    color: #60757b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .25px;
+}
+
+.admin-review-shell .table td {
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
+.admin-review-shell .btn:not(.admin-icon-action) {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-stat-card {
+    padding: 22px 24px;
+}
+
+.admin-stat-card p:first-child {
+    color: #7b8b90 !important;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+.admin-stat-card h3 {
+    margin: 6px 0 0;
+    color: #334e57;
+    font-size: 28px;
+    font-weight: 750;
+}
+
+.admin-review-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-review-cta svg {
+    width: 19px;
+    height: 19px;
+}
+
+.admin-table-wrap {
+    margin-top: 32px;
+    margin-bottom: 24px;
+}
+
+.admin-icon-action {
+    position: relative;
+    display: inline-flex;
+    min-width: 35px;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px !important;
+    line-height: 1;
+}
+
+.admin-icon-action svg {
+    display: block;
+    width: 17px;
+    height: 17px;
+}
+
+.admin-add-action {
+    min-width: 42px;
+    min-height: 40px;
+}
+
+.admin-add-action svg {
+    width: 23px;
+    height: 23px;
+}
+
+.admin-icon-action::after,
+.admin-icon-tooltip::after {
+    position: absolute;
+    z-index: 1200;
+    top: calc(100% + 7px);
+    left: 50%;
+    padding: 6px 9px;
+    border-radius: 5px;
+    background: #263c42;
+    color: #fff;
+    content: attr(data-tooltip);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -3px);
+    transition: opacity .14s ease, transform .14s ease, visibility .14s ease;
+    pointer-events: none;
+}
+
+.admin-icon-action:hover::after,
+.admin-icon-action:focus-visible::after,
+.admin-icon-tooltip:hover::after,
+.admin-icon-tooltip:focus-within::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.admin-icon-tooltip {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.admin-icon-tooltip:has(button:disabled) {
+    cursor: not-allowed;
+}
+
+.admin-icon-action.btn-primary {
+    --bs-btn-bg: var(--accent-color, #317e92);
+    --bs-btn-border-color: var(--accent-color, #317e92);
+    --bs-btn-hover-bg: #286b7c;
+    --bs-btn-hover-border-color: #286b7c;
+}
+
+@media (max-width: 575.98px) {
+    .admin-page-title { font-size: 23px; }
+    .admin-icon-action::after,
+    .admin-icon-tooltip::after {
+        top: auto;
+        bottom: calc(100% + 7px);
+    }
+}

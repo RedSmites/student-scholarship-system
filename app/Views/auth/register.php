@@ -13,10 +13,7 @@
 <?php $old = $old ?? []; $validation = $validation ?? null; $errorFor = static fn (string $field): string => $validation ? (string) $validation->getError($field) : ''; ?>
 <main class="admin-auth-wrap">
   <section class="admin-auth-card admin-auth-register" aria-labelledby="admin-register-title">
-    <div class="admin-auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2 4.5 5v6.1c0 5 3.2 9.5 7.5 10.9 4.3-1.4 7.5-5.9 7.5-10.9V5L12 2Zm0 3.1 4.5 1.8v4.2c0 3.5-2 6.8-4.5 8-2.5-1.2-4.5-4.5-4.5-8V6.9L12 5.1Z"/></svg></div>
-    <p class="admin-auth-eyebrow">MUNICIPAL SCHOLARSHIP PROGRAM</p>
-    <h1 id="admin-register-title">Create administrator account</h1>
-    <p class="text-muted">Enter your details to create an administrator account.</p>
+    <h1 id="admin-register-title" class="mb-4">Create administrator account</h1>
     <form action="<?= site_url('administrator/register') ?>" method="post">
       <?= csrf_field() ?>
       <div class="row g-3">
@@ -32,8 +29,8 @@
       </div>
       <button class="btn btn-primary w-100 mt-4" type="submit">Create administrator account</button>
     </form>
-    <p class="admin-auth-footnote">Already registered? <a href="<?= site_url('administrator') ?>">Administrator sign in</a></p>
-    <p class="text-center mb-0"><a class="admin-auth-back" href="<?= site_url('/') ?>">? Back to the scholarship portal</a></p>
+    <p class="admin-auth-footnote text-center">Already registered? <a href="<?= site_url('administrator') ?>">Administrator sign in</a></p>
+    <p class="text-center mb-0"><a class="admin-auth-back" href="<?= site_url('/') ?>">&larr; Back to main site</a></p>
   </section>
 </main>
 </body></html>

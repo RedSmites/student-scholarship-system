@@ -2,7 +2,7 @@
 <section id="hero" class="hero section">
   <div class="hero-bg"><img src="<?= base_url('assets/img/hero-bg-light.webp') ?>" alt=""></div>
   <div class="container text-center"><div class="d-flex flex-column justify-content-center align-items-center">
-    <h1 data-aos="fade-up"><span class="d-block">Santa Ignacia</span>Municipal <span>Scholarship Program</span></h1>
+    <h1 data-aos="fade-up"><span class="hero-title-location d-block">Santa Ignacia LGU</span><span class="hero-title-program">Municipal Scholarship Program</span></h1>
     <p data-aos="fade-up" data-aos-delay="100">Supporting local students as they pursue their educational goals.</p>
     <div class="d-flex flex-wrap justify-content-center gap-3" data-aos="fade-up" data-aos-delay="200">
       <a href="<?= site_url('requirements') ?>" class="btn-cta">View Requirements</a>

@@ -81,7 +81,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
                 <h2 class="h5 mb-1">Application document requirements</h2>
                 <p class="small text-muted mb-0">These are the PDF upload fields displayed for this scholarship on the student form.</p>
             </div>
-            <button class="btn btn-sm btn-outline-primary" type="button" id="add-requirement">Add document</button>
+            <button class="btn btn-sm btn-outline-primary admin-icon-action admin-add-action" type="button" id="add-requirement" data-tooltip="Add document" aria-label="Add document" title="Add document"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-6 14h-2v-4H7v-2h4V7h2v4h4v2h-4v4Z"/></svg><span class="visually-hidden">Add document</span></button>
         </div>
         <div id="requirement-list" class="d-grid gap-3">
             <?php foreach ($requirementRows as $index => $requirement): ?>
@@ -106,7 +106,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
                             </select>
                         </div>
                         <div class="col-sm-6 col-lg-1">
-                            <button class="btn btn-outline-danger w-100 remove-requirement" type="button" aria-label="Remove document requirement">Remove</button>
+                            <button class="btn btn-outline-danger admin-icon-action remove-requirement" type="button" data-tooltip="Remove document requirement" aria-label="Remove document requirement" title="Remove document requirement"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 7h12l-1 13H7L6 7Zm3-3h6l1 2H8l1-2ZM4 5h16v2H4V5Z"/></svg><span class="visually-hidden">Remove document requirement</span></button>
                         </div>
                     </div>
                 </fieldset>
@@ -142,7 +142,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
                 </select>
             </div>
             <div class="col-sm-6 col-lg-1">
-                <button class="btn btn-outline-danger w-100 remove-requirement" type="button" aria-label="Remove document requirement">Remove</button>
+                <button class="btn btn-outline-danger admin-icon-action remove-requirement" type="button" data-tooltip="Remove document requirement" aria-label="Remove document requirement" title="Remove document requirement"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 7h12l-1 13H7L6 7Zm3-3h6l1 2H8l1-2ZM4 5h16v2H4V5Z"/></svg><span class="visually-hidden">Remove document requirement</span></button>
             </div>
         </div>
     </fieldset>

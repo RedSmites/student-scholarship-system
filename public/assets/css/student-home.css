@@ -1,0 +1,7 @@
+.hero h1 .hero-title-location {
+    color: var(--heading-color, #334e57);
+}
+
+.hero h1 .hero-title-program {
+    color: var(--accent-color, #317e92);
+}

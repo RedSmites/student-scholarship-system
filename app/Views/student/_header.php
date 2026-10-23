@@ -14,6 +14,7 @@
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/student-home.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/student-home.css') ?>" rel="stylesheet">
 </head>
 <body>
 <header id="header" class="header d-flex align-items-center sticky-top">

@@ -18,28 +18,25 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/admin-review.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/admin-review.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/admin-pages.css') ?>?v=<?= filemtime(FCPATH . 'assets/css/admin-pages.css') ?>" rel="stylesheet">
 </head>
 <body class="admin-shell-page">
 <div class="admin-shell">
   <aside class="admin-sidebar" id="admin-sidebar" aria-label="Administrator navigation">
     <a class="admin-sidebar-brand" href="<?= site_url('dashboard') ?>">
-      <span class="admin-brand-mark" aria-hidden="true">MS</span>
-      <span class="admin-brand-copy"><strong>Municipal</strong><small>Scholarship System</small></span>
+      <span class="admin-brand-mark"><img src="<?= base_url('assets/img/sta_ignacia_logo.png') ?>" alt="Santa Ignacia LGU logo"></span>
+      <span class="admin-brand-copy"><strong>Santa Ignacia LGU</strong><small>Municipal Scholarship Program</small></span>
     </a>
     <nav class="admin-side-nav">
-      <p class="admin-nav-caption">MAIN</p>
       <a class="admin-nav-link <?= url_is('dashboard') ? 'is-active' : '' ?>" href="<?= site_url('dashboard') ?>" title="Dashboard">
         <i class="ti ti-home" aria-hidden="true"></i><span>Dashboard</span>
       </a>
-      <p class="admin-nav-caption">APPLICATIONS</p>
       <a class="admin-nav-link <?= $applicationsActive ? 'is-active' : '' ?>" href="<?= site_url('administrator/applications') ?>" title="Applications">
         <i class="ti ti-clipboard-list" aria-hidden="true"></i><span>Applications</span>
       </a>
-      <p class="admin-nav-caption">PROGRAMS</p>
       <a class="admin-nav-link <?= $scholarshipsActive ? 'is-active' : '' ?>" href="<?= site_url('scholarships') ?>" title="Scholarship programs">
         <i class="ti ti-school" aria-hidden="true"></i><span>Scholarship programs</span>
       </a>
-      <p class="admin-nav-caption">ACCOUNT</p>
       <a class="admin-nav-link <?= $settingsActive ? 'is-active' : '' ?>" href="<?= site_url('administrator/settings') ?>" title="Settings">
         <i class="ti ti-settings" aria-hidden="true"></i><span>Settings</span>
       </a>
