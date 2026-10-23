@@ -1,0 +1,120 @@
+:root {
+    color-scheme: light;
+    font-family: Inter, "Segoe UI", sans-serif;
+    color: #253b40;
+    background: #e9eef0;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 18px 56px; background: #e9eef0; }
+.report-shell { width: min(100%, 1180px); margin: 0 auto; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 auto 15px; }
+.toolbar-actions { display: flex; align-items: center; gap: 9px; }
+.toolbar-actions { display: flex; align-items: center; gap: 9px; }
+.toolbar-link, .toolbar-button {
+    display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px;
+    padding: 0 15px; border: 1px solid #d5dfe2; border-radius: 8px; background: #fff;
+    color: #405a61; font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.toolbar-button { border-color: #1b6670; background: #1b6670; color: #fff; }
+.toolbar-link:hover { background: #f7f9fa; }
+.toolbar-button:hover { background: #155660; }
+.paper {
+    min-height: 790px; padding: 40px 42px 34px; border: 1px solid #dce3e5;
+    background: #fff; box-shadow: 0 15px 50px rgba(34, 55, 61, .13);
+}
+.letterhead { display: flex; align-items: center; gap: 19px; padding-bottom: 19px; border-bottom: 3px double #2d6970; }
+.seal { width: 68px; height: 68px; flex: 0 0 68px; object-fit: contain; }
+.office { min-width: 0; flex: 1; }
+.office-kicker { margin: 0 0 5px; color: #527078; font-size: 10px; font-weight: 700; letter-spacing: 1.35px; text-transform: uppercase; }
+.office-name { margin: 0; color: #203f47; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; letter-spacing: .15px; }
+.office-program { margin: 5px 0 0; color: #647b81; font-size: 12px; }
+.document-mark { align-self: center; padding: 7px 10px; border: 1px solid #d9e4e6; color: #537078; font-size: 9px; font-weight: 800; letter-spacing: .9px; text-align: center; text-transform: uppercase; }
+.report-title { padding: 20px 0 14px; text-align: center; }
+.report-title h1 { margin: 0; color: #203940; font-family: Georgia, "Times New Roman", serif; font-size: 25px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.report-title p { margin: 7px 0 0; color: #718287; font-size: 11px; }
+.report-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 15px; border: 1px solid #d5e0e3; background: #fbfcfc; }
+.meta-item { min-height: 50px; padding: 9px 12px; }
+.meta-item + .meta-item { border-left: 1px solid #d5e0e3; }
+.meta-label { display: block; margin-bottom: 4px; color: #7d8d91; font-size: 8px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
+.meta-value { display: block; overflow-wrap: anywhere; color: #314c53; font-size: 10px; font-weight: 700; }
+.filter-note { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: -5px 0 18px; color: #667b80; font-size: 10px; }
+.filter-note strong { color: #344f56; font-weight: 700; }
+.section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 8px; }
+.section-heading h2 { margin: 0; color: #2c464d; font-size: 12px; font-weight: 800; letter-spacing: .65px; text-transform: uppercase; }
+.section-heading span { color: #687d82; font-size: 10px; }
+.sheet-frame { overflow-x: auto; border: 1px solid #c9d4d7; }
+.records { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9px; }
+.records col.row-number { width: 34px; }
+.records col.id { width: 7%; }
+.records col.applicant { width: 20%; }
+.records col.scholarship { width: 19%; }
+.records col.contact { width: 22%; }
+.records col.submitted { width: 16%; }
+.records col.status { width: 16%; }
+.records thead { display: table-header-group; }
+.records .column-letters th { height: 23px; padding: 3px; border: 1px solid #d4dddf; background: #edf1f2; color: #738287; font-size: 8px; font-weight: 600; text-align: center; }
+.records .column-letters th:first-child { background: #e5ebed; }
+.records th { padding: 9px 8px; border: 1px solid #17633d; background: #217346; color: #fff; font-size: 8px; font-weight: 700; letter-spacing: .3px; text-align: left; }
+.records th.row-header { padding: 4px; text-align: center; }
+.records td { height: 34px; padding: 8px; border: 1px solid #d9e0e2; color: #40575d; vertical-align: middle; overflow-wrap: anywhere; line-height: 1.4; }
+.records tbody tr:nth-child(even) td:not(.row-index) { background: #f5f9f7; }
+.records td.row-index { padding: 4px; background: #edf1f2; color: #728086; font-size: 8px; text-align: center; }
+.record-id { color: #718489; font-weight: 700; font-variant-numeric: tabular-nums; }
+.applicant-name { display: block; color: #2d474e; font-weight: 700; }
+.contact-email { display: block; color: #526d74; }
+.contact-phone { display: block; margin-top: 3px; color: #829195; font-size: 9px; }
+.status { color: #52676c; font-weight: 700; }
+.status-approved { color: #287346; }
+.status-rejected { color: #a3453f; }
+.status-under_review { color: #346b99; }
+.status-incomplete { color: #8a681b; }
+.empty-state { padding: 27px 18px; border: 1px solid #e0e8ea; color: #718287; text-align: center; font-size: 11px; }
+.document-footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 20px; padding-top: 9px; border-top: 1px solid #cfdadc; color: #75858a; font-size: 9px; }
+.footer-note { color: #526b71; font-weight: 700; }
+.print-footer { display: none; }
+.page-number::after { content: counter(page); }
+
+@media (max-width: 700px) {
+    body { padding: 14px 8px 28px; }
+    .paper { min-height: 0; padding: 24px 16px; }
+    .letterhead { gap: 12px; }
+    .seal { width: 53px; height: 53px; flex-basis: 53px; }
+    .office-kicker { font-size: 8px; letter-spacing: .7px; }
+    .office-name { font-size: 17px; }
+    .office-program { font-size: 10px; }
+    .document-mark { display: none; }
+    .report-title h1 { font-size: 20px; }
+    .report-meta { grid-template-columns: 1fr; }
+    .meta-item { min-height: 0; padding: 9px 11px; }
+    .meta-item + .meta-item { border-top: 1px solid #dce5e7; border-left: 0; }
+    .records { min-width: 680px; font-size: 9px; }
+    .document-footer { flex-direction: column; }
+}
+
+@media print {
+    @page { size: 8.5in 13in; margin: .9in .38in .6in; }
+    :root, body { background: #fff; }
+    body { padding: 0; color: #253b40; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .report-shell { width: 100%; }
+    .toolbar, .pdf-hint { display: none !important; }
+    .paper { min-height: 0; padding: 0; border: 0; box-shadow: none; }
+    .letterhead { position: fixed; top: -.72in; right: 0; left: 0; padding: 0 0 7px; background: #fff; }
+    .seal { width: 45px; height: 45px; flex-basis: 45px; }
+    .office-name { font-size: 19px; }
+    .report-title { padding: 8px 0 9px; }
+    .report-title h1 { font-size: 17px; }
+    .report-title p { margin-top: 4px; font-size: 9px; }
+    .report-meta { margin-bottom: 9px; }
+    .meta-item { min-height: 39px; padding: 6px 8px; }
+    .filter-note { margin-bottom: 8px; }
+    .section-heading { margin-bottom: 5px; }
+    .sheet-frame { overflow: visible; }
+    .records { font-size: 8px; }
+    .records .column-letters th { height: 16px; padding: 2px; }
+    .records th { padding: 6px; }
+    .records td { height: 26px; padding: 5px 6px; }
+    .records tr { break-inside: avoid; }
+    .document-footer { display: none; }
+    .print-footer { position: fixed; right: 0; bottom: -11mm; left: 0; display: flex; justify-content: space-between; padding-top: 5px; border-top: 1px solid #b9c8cb; background: #fff; color: #667b80; font-size: 8px; }
+}

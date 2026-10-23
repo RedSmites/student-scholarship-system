@@ -28,6 +28,16 @@ $routes->get('register', static fn () => redirect()->to(site_url('administrator/
 
 // Protected administrator application review.
 $routes->get('administrator/applications', 'AdminApplications::index');
+$routes->get('administrator/reports', 'AdminApplications::reports');
+$routes->get('administrator/reports/view', 'AdminApplications::report');
+$routes->get('administrator/reports/pdf', 'AdminApplications::downloadReportPdf');
+$routes->get('administrator/applications/report', 'AdminApplications::report');
+$routes->get('administrator/applications/report/pdf', 'AdminApplications::downloadReportPdf');
+$routes->get('administrator/applications/(:num)/edit', 'AdminApplications::edit/$1');
+$routes->post('administrator/applications/(:num)/edit', 'AdminApplications::saveEdit/$1');
+$routes->post('administrator/applications/(:num)/delete', 'AdminApplications::delete/$1');
+$routes->get('administrator/applications/(:num)/pdf', 'AdminApplications::downloadApplicationPdf/$1');
+$routes->get('administrator/applications/(:num)/print', 'AdminApplications::print/$1');
 $routes->get('administrator/(:num)', 'AdminApplications::show/$1');
 $routes->post('administrator/update/(:num)', 'AdminApplications::update/$1');
 $routes->get('administrator/document/(:num)', 'AdminApplications::download/$1');

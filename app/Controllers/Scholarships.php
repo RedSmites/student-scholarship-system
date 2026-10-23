@@ -14,14 +14,41 @@ class Scholarships extends BaseController
             return $redirect;
         }
 
-        $scholarships = db_connect()->table('scholarships s')
+        $search = $this->request->getGet('q');
+        $status = $this->request->getGet('status');
+        $search = is_string($search) ? trim(mb_substr($search, 0, 190)) : '';
+        if (! is_string($status) || ! in_array($status, ['open', 'closed', 'expired'], true)) {
+            $status = '';
+        }
+
+        $builder = db_connect()->table('scholarships s')
             ->select('s.*, (SELECT COUNT(*) FROM scholarship_requirements r WHERE r.scholarship_id = s.id AND r.is_active = 1) AS requirements_count', false)
             ->select('(SELECT COUNT(*) FROM applications a WHERE a.scholarship_id = s.id) AS applications_count', false)
-            ->orderBy('s.title', 'ASC')
-            ->get()
-            ->getResultArray();
+            ->orderBy('s.created_at', 'DESC')
+            ->orderBy('s.id', 'DESC');
+        if ($search !== '') {
+            $builder->groupStart()
+                ->like('s.title', $search)
+                ->orLike('s.provider', $search)
+                ->groupEnd();
+        }
+        if ($status === 'open') {
+            $builder->where('s.status', 'open')
+                ->groupStart()
+                ->where('s.deadline >=', date('Y-m-d'))
+                ->orWhere('s.deadline', null)
+                ->groupEnd();
+        } elseif ($status === 'closed') {
+            $builder->where('s.status', 'closed');
+        } elseif ($status === 'expired') {
+            $builder->where('s.status', 'open')->where('s.deadline <', date('Y-m-d'));
+        }
+        $scholarships = $builder->get()->getResultArray();
 
-        return view('scholarships/index', ['scholarships' => $scholarships]);
+        return view('scholarships/index', [
+            'scholarships' => $scholarships,
+            'filters' => ['search' => $search, 'status' => $status],
+        ]);
     }
 
     public function newForm()

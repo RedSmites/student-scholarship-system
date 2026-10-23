@@ -1,7 +1,11 @@
 <?php
 $title = $title ?? 'Scholarship administration';
 $currentUri = trim(uri_string(), '/');
-$applicationsActive = $currentUri === 'administrator/applications' || preg_match('~^administrator/(?:\d+|document/\d+)~', $currentUri) === 1;
+$applicationsActive = $currentUri === 'administrator/applications'
+    || preg_match('~^administrator/applications/(?!report(?:/|$)).+~', $currentUri) === 1
+    || preg_match('~^administrator/(?:\d+|document/\d+)~', $currentUri) === 1;
+$reportsActive = str_starts_with($currentUri, 'administrator/reports')
+    || in_array($currentUri, ['administrator/applications/report', 'administrator/applications/report/pdf'], true);
 $scholarshipsActive = str_starts_with($currentUri, 'scholarships');
 $settingsActive = $currentUri === 'administrator/settings';
 $adminName = (string) (session()->get('user_name') ?: 'Administrator');
@@ -37,6 +41,9 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
       </a>
       <a class="admin-nav-link <?= $scholarshipsActive ? 'is-active' : '' ?>" href="<?= site_url('scholarships') ?>" title="Scholarship programs">
         <i class="ti ti-school" aria-hidden="true"></i><span>Scholarship programs</span>
+      </a>
+      <a class="admin-nav-link <?= $reportsActive ? 'is-active' : '' ?>" href="<?= site_url('administrator/reports') ?>" title="Reports">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19.5Z"/><path d="M8 16v-3m4 3V8m4 8v-5M7 19.5v.5m5-.5v.5m5-.5v.5"/></svg><span>Reports</span>
       </a>
       <a class="admin-nav-link <?= $settingsActive ? 'is-active' : '' ?>" href="<?= site_url('administrator/settings') ?>" title="Settings">
         <i class="ti ti-settings" aria-hidden="true"></i><span>Settings</span>

@@ -8,11 +8,39 @@
     <a class="btn btn-primary admin-icon-action admin-add-action" href="<?= site_url('scholarships/new') ?>" data-tooltip="Add scholarship" aria-label="Add scholarship" title="Add scholarship"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7h2Z"/></svg><span class="visually-hidden">Add scholarship</span></a>
 </div>
 
+<form class="admin-card p-3 mb-4" action="<?= site_url('scholarships') ?>" method="get">
+    <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-7">
+            <label class="form-label" for="scholarship-search">Search scholarships</label>
+            <input class="form-control" id="scholarship-search" type="search" name="q" value="<?= esc($filters['search']) ?>" placeholder="Scholarship or provider">
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label" for="scholarship-status">Program status</label>
+            <select class="form-select" id="scholarship-status" name="status">
+                <option value="">All statuses</option>
+                <option value="open" <?= $filters['status'] === 'open' ? 'selected' : '' ?>>Open to students</option>
+                <option value="closed" <?= $filters['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
+                <option value="expired" <?= $filters['status'] === 'expired' ? 'selected' : '' ?>>Deadline passed</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button class="btn btn-primary flex-grow-1" type="submit">Apply</button>
+        </div>
+        <div class="col-12"><a href="<?= site_url('scholarships') ?>">Clear filters</a></div>
+    </div>
+</form>
+
 <?php if (empty($scholarships)): ?>
     <section class="admin-card text-center py-5">
-        <h2 class="h5">No scholarship programs yet</h2>
-        <p class="text-muted">Add a scholarship program to make it available on the student application form.</p>
-        <a class="btn btn-primary admin-icon-action admin-add-action" href="<?= site_url('scholarships/new') ?>" data-tooltip="Add scholarship" aria-label="Add scholarship" title="Add scholarship"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7h2Z"/></svg><span class="visually-hidden">Add scholarship</span></a>
+        <?php if ($filters['search'] !== '' || $filters['status'] !== ''): ?>
+            <h2 class="h5">No matching scholarship programs</h2>
+            <p class="text-muted">Try changing or clearing your search and status filters.</p>
+            <a class="btn btn-outline-primary" href="<?= site_url('scholarships') ?>">Clear filters</a>
+        <?php else: ?>
+            <h2 class="h5">No scholarship programs yet</h2>
+            <p class="text-muted">Add a scholarship program to make it available on the student application form.</p>
+            <a class="btn btn-primary admin-icon-action admin-add-action" href="<?= site_url('scholarships/new') ?>" data-tooltip="Add scholarship" aria-label="Add scholarship" title="Add scholarship"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7h2Z"/></svg><span class="visually-hidden">Add scholarship</span></a>
+        <?php endif ?>
     </section>
 <?php else: ?>
     <div class="table-responsive bg-white rounded shadow-sm admin-table-wrap">
@@ -20,6 +48,7 @@
             <thead class="table-light">
                 <tr>
                     <th scope="col">Scholarship</th>
+                    <th scope="col">Added</th>
                     <th scope="col">Deadline</th>
                     <th scope="col">Status</th>
                     <th scope="col">Student form</th>
@@ -38,6 +67,7 @@
                             <strong><?= esc($scholarship['title']) ?></strong>
                             <div class="small text-muted"><?= esc($scholarship['provider']) ?></div>
                         </td>
+                        <td><?= ! empty($scholarship['created_at']) ? esc(date('M j, Y g:i A', strtotime($scholarship['created_at']))) : '' ?></td>
                         <td><?= ! empty($scholarship['deadline']) ? esc(date('M j, Y', strtotime($scholarship['deadline']))) : 'No deadline' ?></td>
                         <td>
                             <span class="badge text-bg-<?= $isAvailable ? 'success' : 'secondary' ?>">

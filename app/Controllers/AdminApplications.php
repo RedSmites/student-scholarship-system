@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\ApplicationReportPdf;
 use CodeIgniter\HTTP\RedirectResponse;
 
 class AdminApplications extends BaseController
@@ -10,25 +11,352 @@ class AdminApplications extends BaseController
     {
         if ($redirect = $this->requireAdmin()) return $redirect;
 
-        $applications = db_connect()->table('applications a')
+        $filters = $this->applicationFilters();
+        $db = db_connect();
+        $scholarships = $db->table('scholarships')->select('id, title')->orderBy('title', 'ASC')->get()->getResultArray();
+
+        return view('admin/applications', [
+            'applications' => $this->filteredApplications($filters),
+            'filters' => $filters,
+            'scholarships' => $scholarships,
+        ]);
+    }
+
+    public function report()
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $filters = $this->applicationFilters();
+        $applications = $this->filteredApplications($filters);
+        $scholarshipTitle = '';
+        if ($filters['scholarship_id'] !== '') {
+            $scholarship = db_connect()->table('scholarships')
+                ->select('title')->where('id', $filters['scholarship_id'])->get()->getRowArray();
+            $scholarshipTitle = (string) ($scholarship['title'] ?? '');
+        }
+
+        return view('admin/application_report', [
+            'applications' => $applications,
+            'filters' => $filters,
+            'scholarshipTitle' => $scholarshipTitle,
+        ]);
+    }
+
+    public function reports()
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $filters = $this->applicationFilters();
+        $db = db_connect();
+        $scholarships = $db->table('scholarships')->select('id, title')->orderBy('title', 'ASC')->get()->getResultArray();
+
+        return view('admin/reports', [
+            'scholarships' => $scholarships,
+            'applications' => $this->filteredApplications($filters),
+            'filters' => $filters,
+        ]);
+    }
+
+    public function downloadReportPdf()
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $filters = $this->applicationFilters();
+        $applications = $this->filteredApplications($filters);
+        $scholarshipTitle = '';
+        if ($filters['scholarship_id'] !== '') {
+            $scholarship = db_connect()->table('scholarships')
+                ->select('title')->where('id', $filters['scholarship_id'])->get()->getRowArray();
+            $scholarshipTitle = (string) ($scholarship['title'] ?? '');
+        }
+
+        $pdf = (new ApplicationReportPdf())->render($applications, [
+            'generated_at' => date('F j, Y g:i A'),
+            'count' => (string) count($applications),
+            'status' => $filters['status'] !== '' ? ucwords(str_replace('_', ' ', $filters['status'])) : 'All statuses',
+            'search' => $filters['search'],
+            'scholarship' => $scholarshipTitle,
+            'logo_path' => FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'sta_ignacia_logo.png',
+        ]);
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="scholarship-application-report.pdf"')
+            ->setHeader('Content-Length', (string) strlen($pdf))
+            ->setBody($pdf);
+    }
+
+    private function applicationFilters(): array
+    {
+        $allowedStatuses = ['pending', 'under_review', 'incomplete', 'approved', 'rejected'];
+        $search = $this->request->getGet('q');
+        if ($search === null) {
+            $search = $this->request->getGet('search');
+        }
+        $status = $this->request->getGet('status');
+        $scholarshipValue = $this->request->getGet('scholarship_id');
+        $scholarshipId = is_scalar($scholarshipValue) ? filter_var($scholarshipValue, FILTER_VALIDATE_INT) : false;
+
+        return [
+            'search' => is_string($search) ? trim(mb_substr($search, 0, 190)) : '',
+            'status' => is_string($status) && in_array($status, $allowedStatuses, true) ? $status : '',
+            'scholarship_id' => $scholarshipId > 0 ? $scholarshipId : '',
+        ];
+    }
+
+    private function filteredApplications(array $filters): array
+    {
+        $builder = db_connect()->table('applications a')
             ->select('a.id, a.applicant_name, a.email, a.mobile_number, a.status, a.created_at, s.title AS scholarship_title')
             ->join('scholarships s', 's.id = a.scholarship_id')
             ->orderBy('a.created_at', 'DESC')
-            ->get()->getResultArray();
+            ->orderBy('a.id', 'DESC');
 
-        return view('admin/applications', ['applications' => $applications]);
+        if ($filters['search'] !== '') {
+            $builder->groupStart()
+                ->like('a.applicant_name', $filters['search'])
+                ->orLike('a.email', $filters['search'])
+                ->orLike('a.mobile_number', $filters['search'])
+                ->orLike('s.title', $filters['search']);
+            if (ctype_digit($filters['search'])) {
+                $builder->orWhere('a.id', (int) $filters['search']);
+            }
+            $builder->groupEnd();
+        }
+        if ($filters['status'] !== '') {
+            $builder->where('a.status', $filters['status']);
+        }
+        if ($filters['scholarship_id'] !== '') {
+            $builder->where('a.scholarship_id', $filters['scholarship_id']);
+        }
+
+        return $builder->get()->getResultArray();
     }
 
     public function show(int $id)
     {
         if ($redirect = $this->requireAdmin()) return $redirect;
 
+        $application = $this->getApplication($id);
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+
+        return view('admin/application_detail', ['application' => $application]);
+    }
+
+    public function print(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $application = $this->getApplication($id);
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+
+        return view('admin/application_print', ['application' => $application]);
+    }
+
+    public function downloadApplicationPdf(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $application = $this->getApplication($id);
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+
+        $pdf = (new ApplicationReportPdf())->render([$application], [
+            'generated_at' => date('F j, Y g:i A'),
+            'count' => '1',
+            'status' => ucwords(str_replace('_', ' ', (string) $application['status'])),
+            'search' => '',
+            'scholarship' => (string) $application['scholarship_title'],
+            'logo_path' => FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'sta_ignacia_logo.png',
+        ]);
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="application-' . $id . '.pdf"')
+            ->setHeader('Content-Length', (string) strlen($pdf))
+            ->setBody($pdf);
+    }
+
+    public function edit(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $application = $this->getApplication($id);
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+
+        return view('admin/application_edit', ['application' => $application]);
+    }
+
+    public function saveEdit(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $db = db_connect();
+        $application = $db->table('applications')->where('id', $id)->get()->getRowArray();
+        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+
+        $rawDetails = (string) ($application['application_data'] ?? '');
+        $details = $rawDetails === '' ? [] : json_decode($rawDetails, true);
+        if (! is_array($details)) {
+            return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                ->with('error', 'The application details could not be read, so this record cannot be edited safely.');
+        }
+
+        $postedDetails = $this->request->getPost('details');
+        if ($postedDetails === null && $details === []) {
+            $postedDetails = [];
+        }
+        if (! is_array($postedDetails)) {
+            return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                ->with('error', 'Application details were missing. Please try again.');
+        }
+        foreach ($postedDetails as $key => $value) {
+            if (! is_string($key) || ! array_key_exists($key, $details) || ! is_scalar($value)) {
+                return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                    ->with('error', 'The submitted application details are invalid.');
+            }
+            $value = trim((string) $value);
+            if (mb_strlen($value) > 5000) {
+                return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                    ->with('error', 'Application fields must be 5,000 characters or fewer.');
+            }
+            $details[$key] = $value;
+        }
+
+        $emailInput = $this->request->getPost('email');
+        $mobileInput = $this->request->getPost('mobile_number');
+        $email = is_string($emailInput) ? trim($emailInput) : '';
+        $mobileNumber = is_string($mobileInput) ? trim($mobileInput) : '';
+        if (! $this->validate([
+            'email' => 'required|valid_email|max_length[190]',
+            'mobile_number' => 'required|max_length[30]',
+        ])) {
+            return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                ->withInput()
+                ->with('form_errors', $this->validator->getErrors());
+        }
+        if (isset($details['email'])) $details['email'] = $email;
+        if (isset($details['mobile_number'])) $details['mobile_number'] = $mobileNumber;
+
+        if (isset($details['first_name'], $details['last_name'])) {
+            $firstName = trim((string) $details['first_name']);
+            $lastName = trim((string) $details['last_name']);
+            $middleName = trim((string) ($details['middle_name'] ?? ''));
+            if ($firstName === '' || $lastName === '' || mb_strlen($firstName) > 100 || mb_strlen($lastName) > 100 || mb_strlen($middleName) > 100) {
+                return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                    ->with('error', 'First and last name are required and each name field must be 100 characters or fewer.');
+            }
+            $applicantName = $lastName . ', ' . $firstName . ' ' . $middleName;
+            if (mb_strlen($applicantName) > 255) {
+                return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                    ->with('error', 'The full applicant name must be 255 characters or fewer.');
+            }
+            if (isset($details['date_of_birth'])) {
+                $birthDateValue = (string) $details['date_of_birth'];
+                $birthDate = \DateTimeImmutable::createFromFormat('!Y-m-d', $birthDateValue);
+                $dateErrors = \DateTimeImmutable::getLastErrors();
+                if (! $birthDate || ($dateErrors !== false && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0)) || $birthDate->format('Y-m-d') !== $birthDateValue) {
+                    return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                        ->with('error', 'Enter a valid date of birth.');
+                }
+                if ($birthDate > new \DateTimeImmutable('today')) {
+                    return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                        ->with('error', 'Date of birth cannot be in the future.');
+                }
+                if (isset($details['age'])) $details['age'] = (string) $birthDate->diff(new \DateTimeImmutable('today'))->y;
+            }
+        } else {
+            $nameInput = $this->request->getPost('applicant_name');
+            $applicantName = is_string($nameInput) ? trim($nameInput) : '';
+            if ($applicantName === '' || mb_strlen($applicantName) > 255) {
+                return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                    ->with('error', 'Applicant name is required and must be 255 characters or fewer.');
+            }
+        }
+
+        $db->transBegin();
+        $db->table('applications')->where('id', $id)->update([
+            'applicant_name' => $applicantName,
+            'email' => $email,
+            'mobile_number' => $mobileNumber,
+            'application_data' => json_encode($details, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+        if ($db->transStatus() === false) {
+            $db->transRollback();
+            return redirect()->to(site_url('administrator/applications/' . $id . '/edit'))
+                ->with('error', 'The application could not be updated. Please try again.');
+        }
+        $db->transCommit();
+
+        return redirect()->to(site_url('administrator/' . $id))->with('success', 'Application details updated.');
+    }
+
+    public function delete(int $id)
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $db = db_connect();
+        $exists = $db->table('applications')->select('id')->where('id', $id)->get()->getRowArray();
+        if (! $exists) {
+            return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+        }
+        $documents = $db->table('application_documents')->select('file_path')->where('application_id', $id)->get()->getResultArray();
+
+        $db->transBegin();
+        $db->table('application_requirement_checklist')->where('application_id', $id)->delete();
+        $db->table('application_documents')->where('application_id', $id)->delete();
+        $db->table('applications')->where('id', $id)->delete();
+        if ($db->transStatus() === false) {
+            $db->transRollback();
+            return redirect()->to(site_url('administrator/applications'))->with('error', 'The application could not be deleted. Please try again.');
+        }
+        $db->transCommit();
+
+        $uploadDirectory = realpath(WRITEPATH . 'uploads/applications');
+        $fileCleanupFailed = false;
+        if ($uploadDirectory !== false) {
+            foreach ($documents as $document) {
+                $fileName = (string) ($document['file_path'] ?? '');
+                if ($fileName === '' || basename($fileName) !== $fileName) {
+                    log_message('warning', 'Skipped unsafe application file path during deletion for application #{id}.', ['id' => $id]);
+                    $fileCleanupFailed = true;
+                    continue;
+                }
+                $filePath = realpath($uploadDirectory . DIRECTORY_SEPARATOR . $fileName);
+                if ($filePath === false) continue;
+                if (dirname($filePath) !== $uploadDirectory || ! is_file($filePath)) {
+                    log_message('warning', 'Skipped unexpected application file location during deletion for application #{id}.', ['id' => $id]);
+                    $fileCleanupFailed = true;
+                    continue;
+                }
+                if (! unlink($filePath)) {
+                    log_message('error', 'Could not remove uploaded application file: {file}', ['file' => $fileName]);
+                    $fileCleanupFailed = true;
+                }
+            }
+        } elseif ($documents !== []) {
+            log_message('error', 'Could not locate the application upload directory while deleting application #{id}.', ['id' => $id]);
+            $fileCleanupFailed = true;
+        }
+
+        if ($fileCleanupFailed) {
+            return redirect()->to(site_url('administrator/applications'))
+                ->with('error', 'The application was deleted, but one or more uploaded files could not be cleaned up. Please check the application storage.');
+        }
+
+        return redirect()->to(site_url('administrator/applications'))->with('success', 'Application and its uploaded documents were deleted.');
+    }
+
+    private function getApplication(int $id): ?array
+    {
         $db = db_connect();
         $application = $db->table('applications a')
             ->select('a.*, s.title AS scholarship_title, s.provider AS scholarship_provider')
             ->join('scholarships s', 's.id = a.scholarship_id')
             ->where('a.id', $id)->get()->getRowArray();
-        if (! $application) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+        if (! $application) return null;
 
         $application['details'] = json_decode((string) ($application['application_data'] ?? ''), true) ?: [];
         $application['documents'] = $db->table('application_documents')
@@ -36,7 +364,7 @@ class AdminApplications extends BaseController
         $application['checklist'] = $db->table('application_requirement_checklist')
             ->where('application_id', $id)->orderBy('id', 'ASC')->get()->getResultArray();
 
-        return view('admin/application_detail', ['application' => $application]);
+        return $application;
     }
 
     public function update(int $id)
@@ -45,7 +373,7 @@ class AdminApplications extends BaseController
 
         $db = db_connect();
         $existing = $db->table('applications a')
-            ->select('a.status, a.email, a.applicant_name, s.title AS scholarship_title')
+            ->select('a.id, a.status, a.email, a.applicant_name, s.title AS scholarship_title')
             ->join('scholarships s', 's.id = a.scholarship_id', 'left')
             ->where('a.id', $id)->get()->getRowArray();
         if (! $existing) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
@@ -104,7 +432,7 @@ class AdminApplications extends BaseController
             $sent = $this->notifyApplicant($id, $existing, $status, $remarks);
             $message = $sent
                 ? 'Application review saved and the applicant was notified by email.'
-                : 'Application review saved, but the email could not be sent. Check the applicant email and mail settings.';
+                : 'Application review saved, but the email could not be sent. Check the applicant email and configure the Gmail App Password in the local .env file.';
             return redirect()->to(site_url('administrator/' . $id))->with($sent ? 'success' : 'error', $message);
         }
 
@@ -116,65 +444,42 @@ class AdminApplications extends BaseController
         $to = trim((string) ($application['email'] ?? ''));
         if ($to === '' || ! filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
 
-        $name = trim((string) ($application['applicant_name'] ?? '')) ?: 'Applicant';
-        $scholarship = (string) ($application['scholarship_title'] ?? 'your scholarship');
-        $label = ucwords(str_replace('_', ' ', $status));
-        $themes = [
-            'approved'     => ['🎉', '#198754', '#e8f5ee', 'Congratulations! Your application has been approved.'],
-            'rejected'     => ['❌', '#dc3545', '#fdecee', 'We are sorry, your application was not approved.'],
-            'under_review' => ['🔎', '#0d6efd', '#e7f0ff', 'Your application is currently being reviewed.'],
-            'incomplete'   => ['⚠️', '#b86e00', '#fff4e0', 'Your application needs more information or documents.'],
-            'pending'      => ['⏳', '#6c757d', '#f1f3f5', 'Your application has been received and is waiting for review.'],
-        ];
-        [$icon, $color, $tint, $headline] = $themes[$status] ?? $themes['pending'];
-
         $documents = db_connect()->table('application_documents')
             ->where('application_id', $applicationId)->orderBy('id', 'ASC')->get()->getResultArray();
-
-        $docRows = '';
-        foreach ($documents as $doc) {
-            $verified = ! empty($doc['admin_verified']);
-            $note = trim((string) ($doc['admin_remarks'] ?? ''));
-            $docRows .= '<tr><td style="padding:10px 0;border-bottom:1px solid #e9ecef;font-size:14px;color:#212529;">'
-                . ($verified ? '✅' : '📄') . ' <strong>' . esc($doc['requirement_name_snapshot']) . '</strong>'
-                . '<span style="float:right;font-size:12px;color:' . ($verified ? '#198754' : '#6c757d') . ';">' . ($verified ? 'Verified' : 'Not yet verified') . '</span>'
-                . ($note !== '' ? '<div style="margin-top:6px;padding:8px 10px;background:#f8f9fa;border-left:3px solid ' . ($verified ? '#198754' : '#b86e00') . ';font-size:13px;color:#495057;">💬 ' . nl2br(esc($note)) . '</div>' : '')
-                . '</td></tr>';
-        }
-
-        $body = '<div style="background:#f4f6f8;padding:24px 12px;font-family:Segoe UI,Arial,sans-serif;">'
-            . '<table align="center" width="100%" style="max-width:560px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e1e5ea;" cellpadding="0" cellspacing="0">'
-            . '<tr><td style="background:#0d3b66;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:600;">🎓 Scholarship Application Update</td></tr>'
-            . '<tr><td style="padding:24px;">'
-            . '<p style="margin:0 0 16px;font-size:15px;color:#212529;">Hello <strong>' . esc($name) . '</strong>,</p>'
-            . '<p style="margin:0 0 16px;font-size:14px;color:#495057;">There is an update on your application for <strong>' . esc($scholarship) . '</strong>.</p>'
-            . '<div style="background:' . $tint . ';border:1px solid ' . $color . ';border-radius:8px;padding:16px;text-align:center;margin-bottom:20px;">'
-            . '<div style="font-size:32px;line-height:1;">' . $icon . '</div>'
-            . '<div style="margin-top:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6c757d;">Current status</div>'
-            . '<div style="font-size:22px;font-weight:700;color:' . $color . ';">' . esc($label) . '</div>'
-            . '<div style="margin-top:6px;font-size:13px;color:#495057;">' . esc($headline) . '</div></div>';
-
-        if ($remarks !== '') {
-            $body .= '<h3 style="margin:0 0 8px;font-size:15px;color:#0d3b66;">📝 Notes from the administrator</h3>'
-                . '<div style="padding:12px 14px;background:#f8f9fa;border-radius:6px;font-size:14px;color:#212529;margin-bottom:20px;">' . nl2br(esc($remarks)) . '</div>';
-        }
-        if ($docRows !== '') {
-            $body .= '<h3 style="margin:0 0 4px;font-size:15px;color:#0d3b66;">📎 Document review</h3>'
-                . '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">' . $docRows . '</table>';
-        }
-
-        $body .= '<p style="margin:0;font-size:13px;color:#6c757d;">If you have questions, simply reply to this email.<br>Thank you for applying!</p>'
-            . '</td></tr></table></div>';
-
         $config = config('Email');
+        if ($config->SMTPPass === '') {
+            log_message('error', 'Applicant email not sent: Gmail SMTP password is not configured.');
+            return false;
+        }
+
+        $themes = [
+            'approved'     => ['APPROVED', 'Your scholarship application has been approved.', '#147d64', '#e7f5f0', '✓'],
+            'rejected'     => ['NOT APPROVED', 'Your scholarship application was not approved.', '#b42336', '#fdf0f1', '!'],
+            'under_review' => ['UNDER REVIEW', 'Your application is being reviewed by the scholarship office.', '#2457a7', '#eef4ff', '…'],
+            'incomplete'   => ['ACTION NEEDED', 'Please review the requirement notes below for next steps.', '#9a5b00', '#fff6e5', '!'],
+            'pending'      => ['RECEIVED', 'Your application has been received and is waiting for review.', '#586579', '#f1f4f8', '✓'],
+        ];
+        [$decision, $headline, $color, $tint, $icon] = $themes[$status] ?? $themes['pending'];
+        $label = ucwords(str_replace('_', ' ', $status));
+        $body = view('admin/emails/application_status', [
+            'application' => $application,
+            'documents' => $documents,
+            'remarks' => $remarks,
+            'decision' => $decision,
+            'decisionHeading' => in_array($status, ['approved', 'rejected'], true) ? 'FINAL DECISION' : 'APPLICATION STATUS',
+            'headline' => $headline,
+            'statusLabel' => $label,
+            'statusColor' => $color,
+            'statusTint' => $tint,
+            'statusIcon' => $icon,
+        ]);
+
         $config->mailType = 'html';
         $email = service('email', $config, false);
-        if ($config->fromEmail !== '') {
-            $email->setFrom($config->fromEmail, $config->fromName ?: 'Scholarship Office');
-            $email->setReplyTo($config->fromEmail);
-        }
+        $email->setFrom($config->fromEmail, $config->fromName ?: 'Scholarship Office');
+        $email->setReplyTo($config->fromEmail);
         $email->setTo($to);
-        $email->setSubject("{$icon} Scholarship application: {$label}");
+        $email->setSubject("Scholarship application update: {$label}");
         $email->setMessage($body);
 
         try {

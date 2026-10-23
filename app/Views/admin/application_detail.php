@@ -34,7 +34,15 @@ $detailLabels = [
             <h1><?= esc($application['applicant_name'] ?: 'Applicant') ?></h1>
             <p class="review-program"><?= esc($application['scholarship_title']) ?> <span aria-hidden="true">&middot;</span> <?= esc($application['scholarship_provider']) ?></p>
         </div>
-        <span class="badge text-bg-<?= $statusStyle ?> review-status"><?= esc(ucwords(str_replace('_', ' ', $application['status']))) ?></span>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge text-bg-<?= $statusStyle ?> review-status"><?= esc(ucwords(str_replace('_', ' ', $application['status']))) ?></span>
+            <a class="btn btn-sm btn-outline-primary" href="<?= site_url('administrator/applications/' . (int) $application['id'] . '/print') ?>">Print application</a>
+            <a class="btn btn-sm btn-outline-secondary" href="<?= site_url('administrator/applications/' . (int) $application['id'] . '/edit') ?>">Edit application</a>
+            <form action="<?= site_url('administrator/applications/' . (int) $application['id'] . '/delete') ?>" method="post" data-confirm="Permanently delete this application and its uploaded documents?" data-confirm-title="Delete application?" data-confirm-button="Delete application" data-confirm-variant="danger">
+                <?= csrf_field() ?>
+                <button class="btn btn-sm btn-outline-danger" type="submit">Delete application</button>
+            </form>
+        </div>
     </header>
 
     <div class="review-layout">
@@ -131,7 +139,7 @@ $detailLabels = [
                 <textarea class="form-control mb-3" id="application-remarks" name="remarks" rows="5" maxlength="5000" placeholder="Share any next steps or feedback"><?= esc($application['remarks'] ?? '') ?></textarea>
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="notify-applicant" name="notify_applicant" value="1">
-                    <label class="form-check-label" for="notify-applicant">Email the status and notes to the applicant<?= ! empty($application['email']) ? ' (' . esc($application['email']) . ')' : '' ?></label>
+                    <label class="form-check-label" for="notify-applicant">Email this status update and review notes to the applicant<?= ! empty($application['email']) ? ' (' . esc($application['email']) . ')' : '' ?></label>
                 </div>
                 <p class="small text-muted">Approving an application always emails the applicant.</p>
                 <button class="btn btn-primary w-100" type="submit">Save review</button>
