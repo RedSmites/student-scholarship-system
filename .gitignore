@@ -132,3 +132,4 @@ _modules/*
 /writable/logs/*
 /writable/session/*
 /writable/uploads/*
+!/writable/cache/index.html
