@@ -78,13 +78,9 @@
                         <td><?= (int) $scholarship['applications_count'] ?></td>
                         <td>
                             <div class="d-flex flex-wrap gap-2">
-                                <a class="btn btn-sm btn-outline-primary admin-icon-action" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/print') ?>" aria-label="Print scholarship" title="Print scholarship">
+                                <a class="btn btn-sm btn-outline-primary admin-icon-action" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/print') ?>" data-tooltip="Print scholarship" aria-label="Print scholarship" title="Print scholarship">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 8V3h12v5h1a3 3 0 0 1 3 3v7h-4v3H6v-3H2v-7a3 3 0 0 1 3-3h1Zm2-3v3h8V5H8Zm8 14v-5H8v5h8Zm2-7a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
                                     <span class="visually-hidden">Print scholarship</span>
-                                </a>
-                                <a class="btn btn-sm btn-outline-primary admin-icon-action" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/pdf') ?>" aria-label="Download scholarship PDF" title="Download scholarship PDF">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.59l3.3-3.3 1.4 1.42-5.7 5.7-5.7-5.7 1.4-1.42 3.3 3.3V4a1 1 0 0 1 1-1ZM5 19h14v2H5v-2Z"/></svg>
-                                    <span class="visually-hidden">Download scholarship PDF</span>
                                 </a>
                                 <a class="btn btn-sm btn-outline-primary admin-icon-action" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/edit') ?>" data-tooltip="Edit scholarship" aria-label="Edit scholarship" title="Edit scholarship"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25Zm17.7-10.05a1 1 0 0 0 0-1.41l-2.49-2.49a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.98-1.68Z"/></svg><span class="visually-hidden">Edit scholarship</span></a>
                                 <?php if ((int) $scholarship['applications_count'] === 0): ?>

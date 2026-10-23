@@ -18,7 +18,6 @@ $status = $scholarship['status'] === 'open' && $isExpired ? 'Deadline passed' : 
         <a class="toolbar-link" href="<?= site_url('scholarships') ?>">Back to scholarships</a>
         <div class="toolbar-actions">
             <button class="toolbar-link" id="print-report" type="button">Print scholarship</button>
-            <a class="toolbar-button" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/pdf') ?>">Download PDF</a>
         </div>
     </nav>
 
