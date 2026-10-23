@@ -1,0 +1,4 @@
+writable/uploads/** -text
+*.pdf binary
+*.png binary
+*.jpg binary

@@ -133,3 +133,27 @@ _modules/*
 /writable/session/*
 /writable/uploads/*
 !/writable/cache/index.html
+
+# Demo application uploads (fictitious, AI-generated). Real uploads stay ignored.
+/writable/uploads/*
+!/writable/uploads/index.html
+!/writable/uploads/applications/
+/writable/uploads/applications/*
+!/writable/uploads/applications/.htaccess
+!/writable/uploads/applications/index.html
+!/writable/uploads/applications/signature_applicant_*.png
+!/writable/uploads/applications/signature_parent_*.png
+!/writable/uploads/applications/demo_requirement_*.pdf
+!/writable/uploads/applications/alyssa_garcia.png
+!/writable/uploads/applications/angelica_ramos.png
+!/writable/uploads/applications/beatrice_domingo.png
+!/writable/uploads/applications/carlo_reyes.png
+!/writable/uploads/applications/gabriel_torres.png
+!/writable/uploads/applications/jessa_santos.png
+!/writable/uploads/applications/joshua_mendoza.png
+!/writable/uploads/applications/katrina_villanueva.png
+!/writable/uploads/applications/mark_flores.png
+!/writable/uploads/applications/michael_cruz.png
+!/writable/uploads/applications/nathaniel_bautista.png
+!/writable/uploads/applications/nicole_dela_cruz.png
+!/writable/uploads/applications/sofia_aquino.png
