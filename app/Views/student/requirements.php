@@ -1,5 +1,5 @@
 <?php $title = 'Scholarships & Requirements'; include __DIR__ . '/_header.php'; ?>
-<div class="page-title text-center" data-aos="fade"><div class="container"><h1 class="mb-2">Scholarships &amp; Requirements</h1><p class="mb-0">Review available municipal scholarships and the documents each one asks you to prepare.</p></div></div>
+<div class="page-title text-center" data-aos="fade"><div class="container"><h1 class="mb-2">Scholarships &amp; Requirements</h1></div></div>
 <section class="section"><div class="container scholarship-requirements-list">
 <?php if (empty($scholarships)): ?>
   <div class="empty-scholarships text-center"><i class="bi bi-info-circle"></i><h2>No scholarships are open right now</h2><p>Please check back later or contact the Municipal Scholarship Office for information.</p></div>

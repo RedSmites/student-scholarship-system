@@ -62,6 +62,10 @@ class Home extends BaseController
     public function submitApplication()
     {
         $oldApplication = $this->request->getPost();
+        $fieldError = static function (string $field, string $message) use ($oldApplication) {
+            session()->setFlashdata('old_application', $oldApplication);
+            return redirect()->to(site_url('apply'))->with('form_errors', [$field => $message]);
+        };
         $rules = [
             'scholarship_id' => 'required|is_natural_no_zero',
             'last_name' => 'required|max_length[100]', 'first_name' => 'required|max_length[100]',
@@ -98,6 +102,15 @@ class Home extends BaseController
                 $rules[$familyMember . '_' . $namePart] = ($requiredName ? 'required' : 'permit_empty') . '|max_length[100]';
             }
         }
+        foreach (['father', 'mother'] as $parent) {
+            $rules[$parent . '_occupation'] = 'required|max_length[150]';
+            $rules[$parent . '_education'] = 'required|max_length[150]';
+            $rules[$parent . '_house_number'] = 'permit_empty|max_length[80]';
+            $rules[$parent . '_street'] = 'required|max_length[150]';
+            $rules[$parent . '_barangay'] = 'required|max_length[120]';
+            $rules[$parent . '_municipality'] = 'required|max_length[120]';
+            $rules[$parent . '_province'] = 'required|max_length[120]';
+        }
         if ($this->request->getPost('academic_level') === 'Senior High') {
             $rules['intended_school'] = 'required|max_length[180]';
             $rules['intended_school_street'] = 'required|max_length[150]';
@@ -121,8 +134,7 @@ class Home extends BaseController
 
         $photo = $this->request->getFile('applicant_photo');
         if (! $photo || ! $photo->isValid() || ! in_array($photo->getMimeType(), ['image/jpeg', 'image/png'], true)) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Upload a valid applicant photo in JPG or PNG format.');
+            return $fieldError('applicant_photo', 'Upload a valid applicant photo in JPG or PNG format.');
         }
         $uploadedFiles = $this->request->getFiles();
         $documentNames = [];
@@ -131,43 +143,36 @@ class Home extends BaseController
             $document = $this->request->getFile($field);
             if (! $document || ! $document->isValid()) {
                 if (! empty($requirement['is_required'])) {
-                    session()->setFlashdata('old_application', $oldApplication);
-                    return redirect()->to(site_url('apply'))->with('error', 'Attach a PDF for each required document.');
+                    return $fieldError($field, 'Attach a PDF for this required document.');
                 }
                 continue;
             }
             if ($document->getMimeType() !== 'application/pdf' || $document->getSizeByUnit('mb') > 10) {
-                session()->setFlashdata('old_application', $oldApplication);
-                return redirect()->to(site_url('apply'))->with('error', 'Each supporting document must be a PDF no larger than 10 MB.');
+                return $fieldError($field, 'Choose a PDF file no larger than 10 MB.');
             }
             $documentNames[] = ['requirement_id' => (int) $requirement['id'], 'requirement_name' => $requirement['requirement_name'], 'file_name' => $document];
         }
         $documents = $uploadedFiles['documents'] ?? [];
         if (empty($activeRequirements) && empty($documents)) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Attach at least one supporting document as a PDF.');
+            return $fieldError('documents[]', 'Attach at least one supporting document as a PDF.');
         }
         foreach ($documents as $document) {
             if (! $document instanceof UploadedFile || ! $document->isValid() || $document->getMimeType() !== 'application/pdf' || $document->getSizeByUnit('mb') > 10) {
-                session()->setFlashdata('old_application', $oldApplication);
-                return redirect()->to(site_url('apply'))->with('error', 'Supporting documents must be PDF files no larger than 10 MB.');
+                return $fieldError('documents[]', 'Supporting documents must be PDF files no larger than 10 MB.');
             }
         }
         if ($photo->getSizeByUnit('mb') > 5) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Applicant photo must be 5 MB or smaller.');
+            return $fieldError('applicant_photo', 'Applicant photo must be 5 MB or smaller.');
         }
 
         $signatureUploads = [];
         foreach (['applicant' => 'Applicant', 'parent' => 'Parent'] as $key => $label) {
             $signature = $this->request->getFile('signature_' . $key);
             if (! $signature || ! $signature->isValid() || ! in_array($signature->getMimeType(), ['image/jpeg', 'image/png'], true)) {
-                session()->setFlashdata('old_application', $oldApplication);
-                return redirect()->to(site_url('apply'))->with('error', 'Attach a valid JPG or PNG signature image for ' . $label . '.');
+                return $fieldError('signature_' . $key, 'Attach a valid JPG or PNG signature image for ' . $label . '.');
             }
             if ($signature->getSizeByUnit('mb') > 5) {
-                session()->setFlashdata('old_application', $oldApplication);
-                return redirect()->to(site_url('apply'))->with('error', 'Each signature image must be 5 MB or smaller.');
+                return $fieldError('signature_' . $key, 'Each signature image must be 5 MB or smaller.');
             }
             $signatureUploads[] = ['file' => $signature, 'category' => 'signature_' . $key, 'requirement_id' => null, 'requirement_name' => $label . ' signature'];
         }
@@ -193,13 +198,11 @@ class Home extends BaseController
             $birthDate = new \DateTimeImmutable($post['date_of_birth']);
             $today = new \DateTimeImmutable('today');
             if ($birthDate > $today) {
-                session()->setFlashdata('old_application', $oldApplication);
-                return redirect()->to(site_url('apply'))->with('error', 'Date of birth cannot be in the future.');
+                return $fieldError('date_of_birth', 'Date of birth cannot be in the future.');
             }
             $post['age'] = $birthDate->diff($today)->y;
         } catch (\Throwable $e) {
-            session()->setFlashdata('old_application', $oldApplication);
-            return redirect()->to(site_url('apply'))->with('error', 'Enter a valid date of birth.');
+            return $fieldError('date_of_birth', 'Enter a valid date of birth.');
         }
         $applicantName = trim($post['last_name'] . ', ' . $post['first_name'] . ' ' . ($post['middle_name'] ?? ''));
         $directory = WRITEPATH . 'uploads/applications';

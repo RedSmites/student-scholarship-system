@@ -1,3 +1,38 @@
+(function () {
+  document.documentElement.classList.add('js');
+  document.querySelectorAll('#application-form .form-card, .scholarship-requirements-card').forEach(function (element) {
+    if (!element.hasAttribute('data-aos')) element.setAttribute('data-aos', 'fade-up');
+  });
+
+  window.AOS = window.AOS || {
+    init: function (options) {
+      options = options || {};
+      const duration = Number(options.duration) || 600;
+      const targets = Array.from(document.querySelectorAll('[data-aos]'));
+      targets.forEach(function (element) {
+        element.style.transitionDuration = duration + 'ms';
+        const delay = Number(element.getAttribute('data-aos-delay')) || 0;
+        if (delay) element.style.transitionDelay = delay + 'ms';
+      });
+
+      const reveal = function (element) { element.classList.add('aos-animate'); };
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+        targets.forEach(reveal);
+        return;
+      }
+
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          reveal(entry.target);
+          if (options.once !== false) observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.12 });
+      targets.forEach(function (element) { observer.observe(element); });
+    }
+  };
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
 
   var yesRadio = document.getElementById('affected_yes');

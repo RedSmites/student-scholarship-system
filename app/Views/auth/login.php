@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Administrator Login | Municipal Scholarship</title>
+  <link href="<?= base_url('assets/img/sta_ignacia_logo.png') ?>" rel="icon" type="image/png">
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
@@ -19,9 +20,9 @@
       <?= csrf_field() ?>
       <div class="mb-3"><label for="email" class="form-label">Email address</label><input type="email" class="form-control" id="email" name="email" value="<?= esc(old('email') ?? '') ?>" autocomplete="username" maxlength="190" required></div>
       <div class="mb-4"><label for="password" class="form-label">Password</label><input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required></div>
-      <button type="submit" class="btn admin-auth-submit w-100">Sign in</button>
+      <button type="submit" class="btn admin-auth-submit w-100">Login</button>
     </form>
-    <a class="admin-auth-back" href="<?= site_url('/') ?>">&larr; Back to main site</a>
+    <a class="admin-auth-back d-inline-block mt-4" href="<?= site_url('/') ?>">&larr; Back to main site</a>
   </section>
 </main>
 </body></html>

@@ -18,9 +18,9 @@ class SecurityHeaders implements FilterInterface
         $policy = implode('; ', [
             "default-src 'self'",
             "script-src 'self'",
-            "style-src 'self'",
-            "img-src 'self' data:",
-            "font-src 'self'",
+            "style-src 'self' https://fonts.googleapis.com",
+            "img-src 'self' data: blob:",
+            "font-src 'self' https://fonts.gstatic.com",
             "connect-src 'self'",
             "frame-src 'self'",
             "object-src 'none'",

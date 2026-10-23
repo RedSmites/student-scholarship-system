@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     const age = updateAge();
     if (age) addReviewRow(summary, 'Age', age);
-    addReviewRow(summary, 'Applicant photo', photo.name);
+    addReviewRow(summary, 'Applicant photo', photo.name, photoPreview.src);
     signatures.forEach(function (input) {
       const label = input.closest('.signature-upload').querySelector('label').textContent.replace(/\s*\*$/, '');
       addReviewRow(summary, label, input.files[0].name);
@@ -257,13 +257,20 @@ document.addEventListener('DOMContentLoaded', function () {
     docs.forEach(function (file, index) { addReviewRow(summary, 'Requirement document ' + (index + 1), file.name); });
   }
 
-  function addReviewRow(parent, label, value) {
+  function addReviewRow(parent, label, value, imageUrl = "") {
     const row = document.createElement('div');
     row.className = 'review-detail';
     const key = document.createElement('b');
     key.textContent = label;
     const text = document.createElement('span');
     text.textContent = value;
+    if (imageUrl) {
+      const image = document.createElement('img');
+      image.className = 'review-photo-thumbnail';
+      image.src = imageUrl;
+      image.alt = 'Applicant photo preview';
+      text.append(' ', image);
+    }
     row.append(key, text);
     parent.append(row);
   }

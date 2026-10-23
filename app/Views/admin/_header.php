@@ -12,6 +12,7 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($title) ?> | Municipal Scholarship</title>
+  <link href="<?= base_url('assets/img/sta_ignacia_logo.png') ?>" rel="icon" type="image/png">
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
@@ -45,7 +46,7 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
     </nav>
     <div class="admin-sidebar-bottom">
 
-      <form action="<?= site_url('logout') ?>" method="post" class="admin-logout-form">
+      <form action="<?= site_url('logout') ?>" method="post" class="admin-logout-form" data-confirm="Are you sure you want to log out?" data-confirm-title="Log out?" data-confirm-button="Yes, log out" data-confirm-variant="danger">
         <?= csrf_field() ?>
         <button class="admin-nav-link admin-logout-link" type="submit" title="Log out">
           <i class="ti ti-logout" aria-hidden="true"></i><span>Log out</span>
@@ -62,7 +63,7 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
       <div class="admin-topbar-title"><span><?= esc($title) ?></span><small>Municipal Scholarship System</small></div>
       <details class="admin-profile-menu">
         <summary class="admin-topbar-user" aria-label="Open profile menu"><span class="admin-user-avatar"><?= esc($adminInitial) ?></span><span class="admin-user-copy"><strong><?= esc($adminName) ?></strong><small>Administrator</small></span><svg class="admin-profile-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg></summary>
-        <div class="admin-profile-dropdown"><div class="admin-profile-heading"><strong><?= esc($adminName) ?></strong><small><?= esc(session()->get('user_email') ?? '') ?></small></div><a href="<?= site_url('administrator/settings') ?>">Profile &amp; settings</a><form action="<?= site_url('logout') ?>" method="post"><?= csrf_field() ?><button type="submit">Log out</button></form></div>
+        <div class="admin-profile-dropdown"><div class="admin-profile-heading"><strong><?= esc($adminName) ?></strong><small><?= esc(session()->get('user_email') ?? '') ?></small></div><a href="<?= site_url('administrator/settings') ?>">Profile &amp; settings</a><form action="<?= site_url('logout') ?>" method="post" data-confirm="Are you sure you want to log out?" data-confirm-title="Log out?" data-confirm-button="Yes, log out" data-confirm-variant="danger"><?= csrf_field() ?><button type="submit">Log out</button></form></div>
       </details>
     </header>
     <main class="admin-review-shell">

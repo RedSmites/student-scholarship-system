@@ -9,7 +9,7 @@ $value = static fn (string $field): string => esc($old[$field] ?? $user[$field] 
 <div class="admin-settings-heading">
   <div><p class="admin-settings-eyebrow">ACCOUNT</p><h1>Profile &amp; settings</h1><p>Update your administrator details and password.</p></div>
 </div>
-<form action="<?= site_url('administrator/settings') ?>" method="post" class="admin-settings-form">
+<form action="<?= site_url('administrator/settings') ?>" method="post" class="admin-settings-form" data-confirm="Save these profile and password changes?" data-confirm-title="Update settings?" data-confirm-button="Save settings">
   <?= csrf_field() ?>
   <section class="admin-settings-card">
     <div class="admin-settings-card-heading"><span class="admin-settings-avatar"><?= esc(strtoupper(substr($user['first_name'] ?? 'A', 0, 1))) ?></span><div><h2>Profile information</h2><p>Manage the name and email address associated with your account.</p></div></div>

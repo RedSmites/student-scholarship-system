@@ -117,7 +117,7 @@ $detailLabels = [
         </div>
 
         <aside class="review-side-column">
-            <form id="review-form" action="<?= site_url('administrator/update/' . (int) $application['id']) ?>" method="post" class="admin-card review-card review-decision">
+            <form id="review-form" action="<?= site_url('administrator/update/' . (int) $application['id']) ?>" method="post" class="admin-card review-card review-decision" data-confirm="Save the review decision and document notes?" data-confirm-title="Save review?" data-confirm-button="Save review">
                 <?= csrf_field() ?>
                 <p class="review-eyebrow">Administrator</p>
                 <h2>Review decision</h2>

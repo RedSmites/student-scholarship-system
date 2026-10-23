@@ -33,7 +33,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
     </div>
 <?php endif ?>
 
-<form action="<?= esc($formAction) ?>" method="post">
+<form action="<?= esc($formAction) ?>" method="post" data-confirm="<?= $scholarship ? 'Save these scholarship and document requirement changes?' : 'Add this scholarship and its document requirements?' ?>" data-confirm-title="<?= $scholarship ? 'Save scholarship changes?' : 'Add scholarship?' ?>" data-confirm-button="<?= $scholarship ? 'Save changes' : 'Add scholarship' ?>">
     <?= csrf_field() ?>
     <section class="admin-card mb-4">
         <h2 class="h5 mb-3">Scholarship information</h2>

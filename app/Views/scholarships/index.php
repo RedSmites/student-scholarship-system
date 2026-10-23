@@ -50,7 +50,7 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <a class="btn btn-sm btn-outline-primary" href="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/edit') ?>">Edit</a>
                                 <?php if ((int) $scholarship['applications_count'] === 0): ?>
-                                    <form action="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/delete') ?>" method="post" data-confirm="Delete this scholarship and its document requirements?">
+                                    <form action="<?= site_url('scholarships/' . (int) $scholarship['id'] . '/delete') ?>" method="post" data-confirm="Delete this scholarship and its document requirements?" data-confirm-title="Delete scholarship?" data-confirm-button="Delete scholarship" data-confirm-variant="danger">
                                         <?= csrf_field() ?>
                                         <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                                     </form>
