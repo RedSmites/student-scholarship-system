@@ -28,6 +28,19 @@ to your `app` folder. The affected files can be copied or merged from
 Copy `env` to `.env` and tailor for your app, specifically the baseURL
 and any database settings.
 
+## Example application entries
+
+After configuring the database, running the migrations, and creating at least
+one scholarship, run the following command to add three fictitious application
+entries for the scholarship with the lowest ID:
+
+```bash
+php spark db:seed App\Database\Seeds\ScholarshipApplicationsExampleSeeder
+```
+
+The seeder is safe to run again; it skips the example email addresses already
+present in the applications table. It does not create uploaded documents.
+
 ## Important Change with index.php
 
 `index.php` is no longer in the root of the project! It has been moved inside the *public* folder,

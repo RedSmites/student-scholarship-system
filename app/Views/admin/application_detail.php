@@ -129,6 +129,11 @@ $detailLabels = [
                 </select>
                 <label class="form-label" for="application-remarks">Notes for applicant</label>
                 <textarea class="form-control mb-3" id="application-remarks" name="remarks" rows="5" maxlength="5000" placeholder="Share any next steps or feedback"><?= esc($application['remarks'] ?? '') ?></textarea>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="notify-applicant" name="notify_applicant" value="1">
+                    <label class="form-check-label" for="notify-applicant">Email the status and notes to the applicant<?= ! empty($application['email']) ? ' (' . esc($application['email']) . ')' : '' ?></label>
+                </div>
+                <p class="small text-muted">Approving an application always emails the applicant.</p>
                 <button class="btn btn-primary w-100" type="submit">Save review</button>
                 <p class="small text-muted mt-3 mb-0">Document verification and notes are saved with this review.</p>
             </form>

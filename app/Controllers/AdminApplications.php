@@ -44,8 +44,11 @@ class AdminApplications extends BaseController
         if ($redirect = $this->requireAdmin()) return $redirect;
 
         $db = db_connect();
-        $exists = $db->table('applications')->where('id', $id)->countAllResults() > 0;
-        if (! $exists) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
+        $existing = $db->table('applications a')
+            ->select('a.status, a.email, a.applicant_name, s.title AS scholarship_title')
+            ->join('scholarships s', 's.id = a.scholarship_id', 'left')
+            ->where('a.id', $id)->get()->getRowArray();
+        if (! $existing) return redirect()->to(site_url('administrator/applications'))->with('error', 'Application not found.');
 
         $status = (string) $this->request->getPost('status');
         $allowedStatuses = ['pending', 'under_review', 'incomplete', 'approved', 'rejected'];
@@ -95,7 +98,94 @@ class AdminApplications extends BaseController
         }
         $db->transCommit();
 
+        $notify = $this->request->getPost('notify_applicant') === '1'
+            || ($status === 'approved' && $existing['status'] !== 'approved');
+        if ($notify) {
+            $sent = $this->notifyApplicant($id, $existing, $status, $remarks);
+            $message = $sent
+                ? 'Application review saved and the applicant was notified by email.'
+                : 'Application review saved, but the email could not be sent. Check the applicant email and mail settings.';
+            return redirect()->to(site_url('administrator/' . $id))->with($sent ? 'success' : 'error', $message);
+        }
+
         return redirect()->to(site_url('administrator/' . $id))->with('success', 'Application review saved.');
+    }
+
+    private function notifyApplicant(int $applicationId, array $application, string $status, string $remarks): bool
+    {
+        $to = trim((string) ($application['email'] ?? ''));
+        if ($to === '' || ! filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
+
+        $name = trim((string) ($application['applicant_name'] ?? '')) ?: 'Applicant';
+        $scholarship = (string) ($application['scholarship_title'] ?? 'your scholarship');
+        $label = ucwords(str_replace('_', ' ', $status));
+        $themes = [
+            'approved'     => ['🎉', '#198754', '#e8f5ee', 'Congratulations! Your application has been approved.'],
+            'rejected'     => ['❌', '#dc3545', '#fdecee', 'We are sorry, your application was not approved.'],
+            'under_review' => ['🔎', '#0d6efd', '#e7f0ff', 'Your application is currently being reviewed.'],
+            'incomplete'   => ['⚠️', '#b86e00', '#fff4e0', 'Your application needs more information or documents.'],
+            'pending'      => ['⏳', '#6c757d', '#f1f3f5', 'Your application has been received and is waiting for review.'],
+        ];
+        [$icon, $color, $tint, $headline] = $themes[$status] ?? $themes['pending'];
+
+        $documents = db_connect()->table('application_documents')
+            ->where('application_id', $applicationId)->orderBy('id', 'ASC')->get()->getResultArray();
+
+        $docRows = '';
+        foreach ($documents as $doc) {
+            $verified = ! empty($doc['admin_verified']);
+            $note = trim((string) ($doc['admin_remarks'] ?? ''));
+            $docRows .= '<tr><td style="padding:10px 0;border-bottom:1px solid #e9ecef;font-size:14px;color:#212529;">'
+                . ($verified ? '✅' : '📄') . ' <strong>' . esc($doc['requirement_name_snapshot']) . '</strong>'
+                . '<span style="float:right;font-size:12px;color:' . ($verified ? '#198754' : '#6c757d') . ';">' . ($verified ? 'Verified' : 'Not yet verified') . '</span>'
+                . ($note !== '' ? '<div style="margin-top:6px;padding:8px 10px;background:#f8f9fa;border-left:3px solid ' . ($verified ? '#198754' : '#b86e00') . ';font-size:13px;color:#495057;">💬 ' . nl2br(esc($note)) . '</div>' : '')
+                . '</td></tr>';
+        }
+
+        $body = '<div style="background:#f4f6f8;padding:24px 12px;font-family:Segoe UI,Arial,sans-serif;">'
+            . '<table align="center" width="100%" style="max-width:560px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e1e5ea;" cellpadding="0" cellspacing="0">'
+            . '<tr><td style="background:#0d3b66;color:#ffffff;padding:18px 24px;font-size:18px;font-weight:600;">🎓 Scholarship Application Update</td></tr>'
+            . '<tr><td style="padding:24px;">'
+            . '<p style="margin:0 0 16px;font-size:15px;color:#212529;">Hello <strong>' . esc($name) . '</strong>,</p>'
+            . '<p style="margin:0 0 16px;font-size:14px;color:#495057;">There is an update on your application for <strong>' . esc($scholarship) . '</strong>.</p>'
+            . '<div style="background:' . $tint . ';border:1px solid ' . $color . ';border-radius:8px;padding:16px;text-align:center;margin-bottom:20px;">'
+            . '<div style="font-size:32px;line-height:1;">' . $icon . '</div>'
+            . '<div style="margin-top:6px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6c757d;">Current status</div>'
+            . '<div style="font-size:22px;font-weight:700;color:' . $color . ';">' . esc($label) . '</div>'
+            . '<div style="margin-top:6px;font-size:13px;color:#495057;">' . esc($headline) . '</div></div>';
+
+        if ($remarks !== '') {
+            $body .= '<h3 style="margin:0 0 8px;font-size:15px;color:#0d3b66;">📝 Notes from the administrator</h3>'
+                . '<div style="padding:12px 14px;background:#f8f9fa;border-radius:6px;font-size:14px;color:#212529;margin-bottom:20px;">' . nl2br(esc($remarks)) . '</div>';
+        }
+        if ($docRows !== '') {
+            $body .= '<h3 style="margin:0 0 4px;font-size:15px;color:#0d3b66;">📎 Document review</h3>'
+                . '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">' . $docRows . '</table>';
+        }
+
+        $body .= '<p style="margin:0;font-size:13px;color:#6c757d;">If you have questions, simply reply to this email.<br>Thank you for applying!</p>'
+            . '</td></tr></table></div>';
+
+        $config = config('Email');
+        $config->mailType = 'html';
+        $email = service('email', $config, false);
+        if ($config->fromEmail !== '') {
+            $email->setFrom($config->fromEmail, $config->fromName ?: 'Scholarship Office');
+            $email->setReplyTo($config->fromEmail);
+        }
+        $email->setTo($to);
+        $email->setSubject("{$icon} Scholarship application: {$label}");
+        $email->setMessage($body);
+
+        try {
+            $ok = $email->send(false);
+        } catch (\Throwable $e) {
+            log_message('error', 'Applicant email failed: ' . $e->getMessage());
+            return false;
+        }
+        if (! $ok) log_message('error', 'Applicant email failed: ' . $email->printDebugger(['headers']));
+
+        return $ok;
     }
 
     public function download(int $documentId)
