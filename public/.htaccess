@@ -5,6 +5,9 @@ Options -Indexes
 	Header always unset X-Powered-By
 	Header always set X-Content-Type-Options "nosniff"
 	Header always set X-Frame-Options "SAMEORIGIN"
+	# CI adds the CSP on dynamic pages. Add it here for static assets and
+	# Apache-generated responses such as the 403s for disabled directory indexes.
+	Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" "expr=%{REQUEST_URI} =~ m#^/assets(/|$)#"
 </IfModule>
 
 # ----------------------------------------------------------------------

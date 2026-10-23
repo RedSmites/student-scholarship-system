@@ -13,6 +13,7 @@ $adminInitial = strtoupper(substr($adminName, 0, 1));
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($title) ?> | Municipal Scholarship</title>
   <link href="<?= base_url('assets/img/sta_ignacia_logo.png') ?>" rel="icon" type="image/png">
+  <link href="<?= base_url('assets/css/fonts.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">

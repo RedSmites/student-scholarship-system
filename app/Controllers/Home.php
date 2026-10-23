@@ -50,12 +50,16 @@ class Home extends BaseController
             $scholarships = [];
         }
         $old = session()->getFlashdata('old_application') ?? [];
+        $requestedScholarshipId = $old['scholarship_id'] ?? $this->request->getGet('scholarship_id');
+        $selectedScholarshipId = is_string($requestedScholarshipId) || is_int($requestedScholarshipId)
+            ? filter_var($requestedScholarshipId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : false;
 
         return view('student/application', [
             'old' => $old,
             'scholarships' => $scholarships,
             'requirementsByScholarship' => $requirementsByScholarship,
-            'selectedScholarshipId' => (int) ($old['scholarship_id'] ?? $this->request->getGet('scholarship_id') ?? 0),
+            'selectedScholarshipId' => $selectedScholarshipId === false ? 0 : $selectedScholarshipId,
         ]);
     }
 
