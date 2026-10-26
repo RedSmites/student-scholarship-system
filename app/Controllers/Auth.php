@@ -8,6 +8,11 @@ class Auth extends BaseController
 {
     public function register()
     {
+        if ($this->administratorExists()) {
+            return redirect()->to(site_url('administrator'))
+                ->with('error', 'Administrator registration is closed. Please sign in with an existing administrator account.');
+        }
+
         return view('auth/register', [
             'validation' => \Config\Services::validation(),
             'old' => [],
@@ -16,6 +21,11 @@ class Auth extends BaseController
 
     public function processRegister()
     {
+        if ($this->administratorExists()) {
+            return redirect()->to(site_url('administrator'))
+                ->with('error', 'Administrator registration is closed. Please sign in with an existing administrator account.');
+        }
+
         $rules = [
             'first_name' => 'required|trim|max_length[100]',
             'middle_name' => 'permit_empty|trim|max_length[100]',
@@ -38,16 +48,28 @@ class Auth extends BaseController
             return view('auth/register', ['validation' => $this->validator, 'old' => $old]);
         }
 
-        (new UserModel())->insert([
-            'first_name' => trim($old['first_name']),
-            'middle_name' => trim($old['middle_name']) ?: null,
-            'last_name' => trim($old['last_name']),
-            'suffix' => trim($old['suffix']) ?: null,
-            'email' => strtolower(trim($old['email'])),
-            'password_hash' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role' => 'admin',
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
+        $userModel = new UserModel();
+        try {
+            $created = $userModel->insert([
+                'first_name' => trim($old['first_name']),
+                'middle_name' => trim($old['middle_name']) ?: null,
+                'last_name' => trim($old['last_name']),
+                'suffix' => trim($old['suffix']) ?: null,
+                'email' => strtolower(trim($old['email'])),
+                'password_hash' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
+                'role' => 'admin',
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Administrator registration failed: {message}', ['message' => $e->getMessage()]);
+            return redirect()->to(site_url('administrator/register'))
+                ->with('error', 'The administrator account could not be created. Please try again.');
+        }
+        if ($created === false) {
+            log_message('error', 'Administrator registration failed: {errors}', ['errors' => json_encode($userModel->errors())]);
+            return redirect()->to(site_url('administrator/register'))
+                ->with('error', 'The administrator account could not be created. Please check the details and try again.');
+        }
 
         return redirect()->to(site_url('administrator'))->with('success', 'Administrator account created. You can now sign in.');
     }
@@ -100,10 +122,6 @@ class Auth extends BaseController
             'isLoggedIn' => true,
         ]);
 
-        if ($user['role'] === 'admin') {
-            return redirect()->to(site_url('dashboard'));
-        }
-
         return redirect()->to(site_url('dashboard'));
     }
 
@@ -113,5 +131,10 @@ class Auth extends BaseController
 
         return redirect()->to(site_url('administrator'))
             ->with('success', 'You have been logged out.');
+    }
+
+    private function administratorExists(): bool
+    {
+        return (new UserModel())->where('role', 'admin')->countAllResults() > 0;
     }
 }

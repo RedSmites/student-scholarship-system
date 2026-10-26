@@ -46,14 +46,12 @@ class AdminApplications extends BaseController
     {
         if ($redirect = $this->requireAdmin()) return $redirect;
 
-        $filters = $this->applicationFilters();
         $db = db_connect();
-        $scholarships = $db->table('scholarships')->select('id, title')->orderBy('title', 'ASC')->get()->getResultArray();
+        $scholarships = $db->table('scholarships')->select('id, title')->orderBy('created_at', 'DESC')->orderBy('id', 'DESC')->get()->getResultArray();
 
         return view('admin/reports', [
             'scholarships' => $scholarships,
-            'applications' => $this->filteredApplications($filters),
-            'filters' => $filters,
+            'applicationCount' => (int) $db->table('applications')->countAllResults(),
         ]);
     }
 
@@ -82,7 +80,9 @@ class AdminApplications extends BaseController
         return $this->response
             ->setStatusCode(200)
             ->setHeader('Content-Type', 'application/pdf')
-            ->setHeader('Content-Disposition', 'attachment; filename="scholarship-application-report.pdf"')
+            ->setHeader('Content-Disposition', $this->request->getGet('download') === '1'
+                ? 'attachment; filename="scholarship-application-report.pdf"'
+                : 'inline; filename="scholarship-application-report.pdf"')
             ->setHeader('Content-Length', (string) strlen($pdf))
             ->setBody($pdf);
     }

@@ -90,6 +90,23 @@ class Scholarships extends BaseController
             ->setBody($pdf);
     }
 
+    public function reportPdf()
+    {
+        if ($redirect = $this->requireAdmin()) return $redirect;
+
+        $scholarships = db_connect()->table('scholarships')->orderBy('created_at', 'DESC')->orderBy('id', 'DESC')->get()->getResultArray();
+        $pdf = (new ApplicationReportPdf())->renderScholarshipDirectory($scholarships, [
+            'generated_at' => date('F j, Y g:i A'),
+            'logo_path' => FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'sta_ignacia_logo.png',
+        ]);
+        return $this->response->setStatusCode(200)
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', $this->request->getGet('download') === '1'
+                ? 'attachment; filename="scholarship-programs-report.pdf"'
+                : 'inline; filename="scholarship-programs-report.pdf"')
+            ->setHeader('Content-Length', (string) strlen($pdf))->setBody($pdf);
+    }
+
     /**
      * @return array{scholarship: array, requirements: array}|null
      */
@@ -103,7 +120,7 @@ class Scholarships extends BaseController
         $requirements = (new ScholarshipRequirementModel())
             ->where('scholarship_id', $id)
             ->where('is_active', 1)
-            ->orderBy('id', 'ASC')
+            ->orderBy('id', 'DESC')
             ->findAll();
 
         return ['scholarship' => $scholarship, 'requirements' => $requirements];
@@ -187,7 +204,7 @@ class Scholarships extends BaseController
         $requirements = (new ScholarshipRequirementModel())
             ->where('scholarship_id', $id)
             ->where('is_active', 1)
-            ->orderBy('id', 'ASC')
+            ->orderBy('id', 'DESC')
             ->findAll();
 
         return view('scholarships/form', [

@@ -186,6 +186,55 @@ class ApplicationReportPdf
         return $this->buildPdf($pages, $logo);
     }
 
+    public function renderScholarshipDirectory(array $scholarships, array $metadata): string
+    {
+        $pages = [];
+        $pageNumber = 1;
+        $content = '';
+        $y = 0;
+        $start = function () use (&$content, &$y, &$pageNumber, $scholarships, $metadata): void {
+            $content = "q 38 0 0 38 28 856 cm /Logo Do Q\n";
+            $content .= $this->text(72, 883, 'MUNICIPALITY OF SANTA IGNACIA', 11, 'F2', [.12, .25, .28]);
+            $content .= $this->text(72, 868, 'MUNICIPAL SCHOLARSHIP PROGRAM', 8, 'F1', [.36, .45, .47]);
+            $content .= $this->line(self::LEFT, 848, self::LEFT + self::TABLE_WIDTH, 848, [.20, .43, .45], 1.5);
+            $content .= $this->text(self::LEFT, 820, 'SCHOLARSHIP PROGRAM REPORT', 15, 'F2', [.12, .24, .27]);
+            $content .= $this->text(self::LEFT, 802, 'Consolidated program records', 8, 'F1', [.43, .51, .53]);
+            $content .= $this->line(self::LEFT, 53, self::LEFT + self::TABLE_WIDTH, 53, [.72, .78, .79]);
+            $content .= $this->text(self::LEFT, 39, 'MUNICIPAL SCHOLARSHIP SYSTEM  |  ADMINISTRATIVE COPY', 7, 'F2', [.37, .47, .49]);
+            $content .= $this->text(480, 39, 'PAGE ' . $pageNumber, 7, 'F2', [.37, .47, .49]);
+            $content .= $this->rect(self::LEFT, 746, self::TABLE_WIDTH, 34, [.97, .98, .98], [.82, .86, .87]);
+            $content .= $this->text(self::LEFT + 8, 767, 'PROGRAMS', 6, 'F2', [.48, .56, .58]);
+            $content .= $this->text(self::LEFT + 8, 753, (string) count($scholarships), 9, 'F2', [.20, .31, .33]);
+            $content .= $this->text(390, 767, 'GENERATED', 6, 'F2', [.48, .56, .58]);
+            $content .= $this->text(390, 753, (string) ($metadata['generated_at'] ?? ''), 8, 'F2', [.20, .31, .33]);
+            $content .= $this->text(self::LEFT, 723, 'PROGRAM', 7, 'F2', [.19, .34, .37]);
+            $content .= $this->text(390, 723, 'PROVIDER', 7, 'F2', [.19, .34, .37]);
+            $content .= $this->text(520, 723, 'STATUS', 7, 'F2', [.19, .34, .37]);
+            $content .= $this->line(self::LEFT, 715, self::LEFT + self::TABLE_WIDTH, 715, [.72, .78, .79]);
+            $y = 707;
+        };
+        $start();
+        foreach ($scholarships as $index => $scholarship) {
+            if ($y < 75) {
+                $pages[] = $this->finishPage($content, $pageNumber++);
+                $start();
+            }
+            $height = 34;
+            $content .= $this->rect(self::LEFT, $y - $height, self::TABLE_WIDTH, $height, $index % 2 === 0 ? [1, 1, 1] : [.965, .976, .969], [.82, .86, .87]);
+            $title = $this->wrap((string) ($scholarship['title'] ?? ''), 300, 8);
+            $provider = $this->wrap((string) ($scholarship['provider'] ?? ''), 116, 7);
+            $content .= $this->text(self::LEFT + 7, $y - 13, '#' . (int) $scholarship['id'] . ' ' . ($title[0] ?? ''), 8, 'F2', [.20, .31, .33]);
+            if (isset($title[1])) $content .= $this->text(self::LEFT + 20, $y - 24, $title[1], 7, 'F1', [.35, .43, .45]);
+            $content .= $this->text(390, $y - 16, $provider[0] ?? '', 7, 'F1', [.25, .35, .37]);
+            $content .= $this->text(520, $y - 16, strtoupper((string) ($scholarship['status'] ?? 'closed')), 7, 'F2', [.20, .40, .32]);
+            $y -= $height;
+        }
+        if ($scholarships === []) $content .= $this->text(self::LEFT, $y - 15, 'No scholarship programs have been added.', 8, 'F1', [.40, .49, .51]);
+        $pages[] = $this->finishPage($content, $pageNumber);
+        $logo = isset($metadata['logo_path']) ? $this->loadPngLogo((string) $metadata['logo_path']) : null;
+        return $this->buildPdf($pages, $logo);
+    }
+
     private function startPage(array $metadata, int $pageNumber): array
     {
         $content = '';

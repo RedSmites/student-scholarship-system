@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title">
-  <title id="title">Municipal logo placeholder</title>
-  <circle cx="50" cy="50" r="46" fill="#f4f3eb" stroke="#1f563b" stroke-width="3"/>
-  <circle cx="50" cy="50" r="35" fill="none" stroke="#c77642" stroke-width="1.5"/>
-  <path d="M50 27 65 35v15c0 12-8 20-15 24-7-4-15-12-15-24V35z" fill="#1f563b"/>
-  <path d="m43 49 5 5 10-11" fill="none" stroke="#f4f3eb" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-  <text x="50" y="17" text-anchor="middle" fill="#1f563b" font-family="sans-serif" font-size="6" letter-spacing="1">MUNICIPALITY</text>
-</svg>

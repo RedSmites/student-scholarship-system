@@ -31,6 +31,7 @@ $routes->get('administrator/applications', 'AdminApplications::index');
 $routes->get('administrator/reports', 'AdminApplications::reports');
 $routes->get('administrator/reports/view', 'AdminApplications::report');
 $routes->get('administrator/reports/pdf', 'AdminApplications::downloadReportPdf');
+$routes->get('administrator/reports/scholarships/pdf', 'Scholarships::reportPdf');
 $routes->get('administrator/applications/report', 'AdminApplications::report');
 $routes->get('administrator/applications/report/pdf', 'AdminApplications::downloadReportPdf');
 $routes->get('administrator/applications/(:num)/edit', 'AdminApplications::edit/$1');

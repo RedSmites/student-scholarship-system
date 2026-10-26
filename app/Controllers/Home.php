@@ -18,19 +18,15 @@ class Home extends BaseController
         $scholarships = [];
         try {
             $scholarships = $this->getOpenScholarships();
-            $requirements = (new ScholarshipRequirementModel())
-                ->where('is_active', 1)->orderBy('requirement_name', 'ASC')->findAll();
-            $grouped = [];
-            foreach ($requirements as $requirement) {
-                $grouped[(int) $requirement['scholarship_id']][] = $requirement;
-            }
-            foreach ($scholarships as &$scholarship) {
-                $scholarship['requirements'] = $grouped[(int) $scholarship['id']] ?? [];
-            }
-            unset($scholarship);
         } catch (\Throwable $e) {
+            log_message('error', 'Could not load open scholarships: {message}', ['message' => $e->getMessage()]);
             $scholarships = [];
         }
+        $groupedRequirements = $this->activeRequirementGroups();
+        foreach ($scholarships as &$scholarship) {
+            $scholarship['requirements'] = $groupedRequirements[(int) $scholarship['id']] ?? [];
+        }
+        unset($scholarship);
 
         return view('student/requirements', ['scholarships' => $scholarships]);
     }
@@ -38,17 +34,13 @@ class Home extends BaseController
     public function apply(): string
     {
         $scholarships = [];
-        $requirementsByScholarship = [];
         try {
             $scholarships = $this->getOpenScholarships();
-            $requirements = (new ScholarshipRequirementModel())
-                ->where('is_active', 1)->orderBy('requirement_name', 'ASC')->findAll();
-            foreach ($requirements as $requirement) {
-                $requirementsByScholarship[(int) $requirement['scholarship_id']][] = $requirement;
-            }
         } catch (\Throwable $e) {
+            log_message('error', 'Could not load open scholarships for application: {message}', ['message' => $e->getMessage()]);
             $scholarships = [];
         }
+        $requirementsByScholarship = $this->activeRequirementGroups();
         $old = session()->getFlashdata('old_application') ?? [];
         $requestedScholarshipId = $old['scholarship_id'] ?? $this->request->getGet('scholarship_id');
         $selectedScholarshipId = is_string($requestedScholarshipId) || is_int($requestedScholarshipId)
@@ -306,7 +298,28 @@ class Home extends BaseController
                 ->where('deadline', null)
                 ->orWhere('deadline >=', date('Y-m-d'))
             ->groupEnd()
-            ->orderBy('deadline', 'ASC')
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('id', 'DESC')
             ->findAll();
+    }
+
+    private function activeRequirementGroups(): array
+    {
+        try {
+            $requirements = (new ScholarshipRequirementModel())
+                ->where('is_active', 1)
+                ->orderBy('id', 'DESC')
+                ->findAll();
+        } catch (\Throwable $e) {
+            log_message('error', 'Could not load active scholarship requirements: {message}', ['message' => $e->getMessage()]);
+            return [];
+        }
+
+        $grouped = [];
+        foreach ($requirements as $requirement) {
+            $grouped[(int) $requirement['scholarship_id']][] = $requirement;
+        }
+
+        return $grouped;
     }
 }

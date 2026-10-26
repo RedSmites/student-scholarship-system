@@ -28,6 +28,10 @@ to your `app` folder. The affected files can be copied or merged from
 Copy `env` to `.env` and tailor for your app, specifically the baseURL
 and any database settings.
 
+Create the first administrator account at `/administrator/register`. Registration
+closes after an administrator account exists, so the public form cannot be used
+to add additional privileged accounts.
+
 ## Example application entries
 
 After configuring the database, running the migrations, and creating at least

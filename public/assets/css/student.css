@@ -79,3 +79,57 @@ html.js [data-aos="zoom-out"]{transform:scale(1.05)}
 html.js [data-aos].aos-animate{opacity:1;transform:translate3d(0,0,0)}
 @media(max-width:768px){html.js [data-aos][data-aos-delay]{transition-delay:0ms!important}}
 @media(prefers-reduced-motion:reduce){html.js [data-aos]{opacity:1!important;transform:none!important;transition:none!important}}
+
+/* Requirements page alignment and PDF tile cleanup */
+.scholarship-facts > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.scholarship-facts h3,
+.scholarship-documents > h3 {
+  text-align: center;
+}
+.scholarship-facts h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.requirement-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.requirement-row h4,
+.requirement-row p {
+  margin-left: auto;
+  margin-right: auto;
+}
+.req-placeholder {
+  display: none;
+}/* Public requirements page spacing and flexible empty/partial sections. */
+.scholarship-requirements-list{gap:34px}
+.scholarship-requirements-card{padding:30px 32px}
+.scholarship-facts{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));align-items:stretch;gap:24px;padding:24px 0}
+.scholarship-facts>div{padding:8px 10px;text-align:center}
+.scholarship-facts h3{margin:0 0 12px}
+.scholarship-facts p{line-height:1.75}
+.scholarship-documents{padding-top:26px}
+.scholarship-documents>h3{margin:0 0 20px;font-size:20px;line-height:1.35}
+.requirement-rows{gap:0 24px}
+.requirement-row{display:block;min-height:110px;padding:22px 12px;text-align:center}
+.requirement-content h4{margin:7px 0 6px;font-size:15px}
+.requirement-content p{margin:0;line-height:1.65}
+.no-requirements{padding:22px;margin:0;line-height:1.7}
+@media(max-width:767px){.scholarship-requirements-card{padding:22px 18px}.scholarship-facts{grid-template-columns:1fr;gap:12px}.scholarship-facts>div{padding:12px}.requirement-row{min-height:0;padding:20px 8px}}
+/* Individual requirement cards for easier scanning. */
+.requirement-rows{gap:14px 18px}
+.requirement-row{display:flex;min-height:116px;align-items:center;justify-content:center;padding:22px 20px;border:1px solid #e5edef;border-radius:10px;background:#fff;box-shadow:0 3px 12px rgba(35,70,80,.045);text-align:center}
+.requirement-row h4{margin:0 0 8px}
+.requirement-content p{margin:0;line-height:1.65}
+.optional-label{display:inline-block;margin-left:5px;padding:3px 7px;border-radius:999px;background:#f1f4f5;color:#66777c;font:700 9px var(--default-font);text-transform:uppercase;vertical-align:middle}
+@media(max-width:767px){.requirement-rows{gap:12px}.requirement-row{min-height:0;padding:20px 16px}}

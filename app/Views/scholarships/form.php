@@ -21,9 +21,9 @@ if (is_array($oldRequirements)) {
 $formErrors = session()->getFlashdata('form_errors') ?? [];
 ?>
 <div class="mb-4">
-    <p class="text-uppercase small text-primary fw-bold mb-1"><a href="<?= site_url('scholarships') ?>">Scholarship programs</a></p>
-    <h1 class="h2 mb-1"><?= esc($formTitle) ?></h1>
-    <p class="text-muted mb-0">These details appear in the public scholarship listing and student application choices.</p>
+    <p class="admin-page-eyebrow"><a href="<?= site_url('scholarships') ?>">Scholarship programs</a></p>
+    <h1 class="admin-page-title"><?= esc($formTitle) ?></h1>
+    <p class="admin-page-description">These details appear in the public scholarship listing and student application choices.</p>
 </div>
 
 <?php if ($formErrors): ?>
@@ -33,7 +33,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
     </div>
 <?php endif ?>
 
-<form action="<?= esc($formAction) ?>" method="post" data-confirm="<?= $scholarship ? 'Save these scholarship and document requirement changes?' : 'Add this scholarship and its document requirements?' ?>" data-confirm-title="<?= $scholarship ? 'Save scholarship changes?' : 'Add scholarship?' ?>" data-confirm-button="<?= $scholarship ? 'Save changes' : 'Add scholarship' ?>">
+<form class="scholarship-form" action="<?= esc($formAction) ?>" method="post" data-confirm="<?= $scholarship ? 'Save these scholarship and document requirement changes?' : 'Add this scholarship and its document requirements?' ?>" data-confirm-title="<?= $scholarship ? 'Save scholarship changes?' : 'Add scholarship?' ?>" data-confirm-button="<?= $scholarship ? 'Save changes' : 'Add scholarship' ?>">
     <?= csrf_field() ?>
     <section class="admin-card mb-4">
         <h2 class="h5 mb-3">Scholarship information</h2>
@@ -81,7 +81,7 @@ $formErrors = session()->getFlashdata('form_errors') ?? [];
                 <h2 class="h5 mb-1">Application document requirements</h2>
                 <p class="small text-muted mb-0">These are the PDF upload fields displayed for this scholarship on the student form.</p>
             </div>
-            <button class="btn btn-sm btn-outline-primary admin-icon-action admin-add-action" type="button" id="add-requirement" data-tooltip="Add document" aria-label="Add document" title="Add document"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-6 14h-2v-4H7v-2h4V7h2v4h4v2h-4v4Z"/></svg><span class="visually-hidden">Add document</span></button>
+            <button class="btn btn-sm btn-outline-primary admin-icon-action admin-add-action" type="button" id="add-requirement" data-tooltip="Add document" aria-label="Add document" title="Add document"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path fill="#317e92" d="M13 7v4h4v2h-4v4h-2v-4H7v-2h4V7h2Z"/></svg><span class="visually-hidden">Add document</span></button>
         </div>
         <div id="requirement-list" class="d-grid gap-3">
             <?php foreach ($requirementRows as $index => $requirement): ?>

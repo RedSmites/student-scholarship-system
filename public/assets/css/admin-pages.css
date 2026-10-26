@@ -114,6 +114,29 @@
     line-height: 1;
 }
 
+/* Reports and edit forms share the same compact administrator typography. */
+.admin-report-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.admin-report-card { display:flex; flex-direction:column; align-items:flex-start; gap:18px; padding:24px; }
+.admin-report-card h2 { margin:0 0 8px; color:#334e57; font-size:18px; font-weight:750; }
+.admin-report-card p:not(.admin-page-eyebrow) { margin:0 0 10px; color:#718087; font-size:12px; line-height:1.65; }
+.admin-report-card strong { color:#536a70; font-size:11px; }
+.admin-report-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:auto; }
+.admin-report-actions .btn { font-size:12px; font-weight:650; }
+.admin-report-actions .btn-primary { --bs-btn-bg:var(--accent-color,#317e92); --bs-btn-border-color:var(--accent-color,#317e92); --bs-btn-hover-bg:#286b7c; --bs-btn-hover-border-color:#286b7c; }
+.admin-review-shell .review-page { max-width:1100px; margin:0 auto; color:#50676d; font-size:13px; }
+.admin-review-shell .review-page h1 { color:#334e57; font-size:25px; font-weight:750; }
+.admin-review-shell .review-page h2 { color:#334e57; font-size:15px; font-weight:750; }
+.admin-review-shell .review-page .form-label { margin-bottom:6px; color:#50676d; font-size:11px; font-weight:700; }
+.admin-review-shell .review-page .form-control,
+.admin-review-shell .review-page .form-select { min-height:41px; border-color:#dce5e7; font-size:13px; }
+.admin-review-shell .review-page textarea.form-control { min-height:initial; }
+.admin-review-shell .review-page .btn { font-size:12px; font-weight:650; }
+.admin-review-shell .review-page .btn-primary { --bs-btn-bg:var(--accent-color,#317e92); --bs-btn-border-color:var(--accent-color,#317e92); --bs-btn-hover-bg:#286b7c; --bs-btn-hover-border-color:#286b7c; }
+.admin-review-shell > form:not(.admin-settings-form) { max-width:1100px; margin:0 auto; }
+.admin-review-shell > form:not(.admin-settings-form) .admin-card,
+.admin-review-shell .review-page .admin-card { padding:24px; border:1px solid #e4ecee; border-radius:12px; box-shadow:0 5px 20px rgba(40,80,88,.055); }
+.admin-review-shell .review-page .review-card { background:#fff; }
+
 .admin-icon-action svg {
     display: block;
     width: 17px;
@@ -130,7 +153,7 @@
     height: 23px;
 }
 
-.admin-icon-action::after,
+.admin-icon-action[data-tooltip]:not([data-tooltip=""])::after,
 .admin-icon-tooltip::after {
     position: absolute;
     z-index: 1200;
@@ -152,8 +175,8 @@
     pointer-events: none;
 }
 
-.admin-icon-action:hover::after,
-.admin-icon-action:focus-visible::after,
+.admin-icon-action[data-tooltip]:not([data-tooltip=""]):hover::after,
+.admin-icon-action[data-tooltip]:not([data-tooltip=""]):focus-visible::after,
 .admin-icon-tooltip:hover::after,
 .admin-icon-tooltip:focus-within::after {
     opacity: 1;
@@ -179,6 +202,8 @@
 }
 
 @media (max-width: 575.98px) {
+    .admin-report-grid { grid-template-columns:1fr; }
+    .admin-report-card { padding:20px; }
     .admin-page-title { font-size: 23px; }
     .admin-icon-action::after,
     .admin-icon-tooltip::after {
@@ -186,3 +211,24 @@
         bottom: calc(100% + 7px);
     }
 }
+/* Scholarship editor: soften entered text and give fields more breathing room. */
+.admin-review-shell .scholarship-form .admin-card{padding:28px 30px}
+.admin-review-shell .scholarship-form .admin-card>h2,
+.admin-review-shell .scholarship-form .admin-card h2.h5{margin-bottom:22px!important;color:#405961;font-size:18px;font-weight:700}
+.admin-review-shell .scholarship-form .row.g-3{--bs-gutter-y:1.35rem}
+.admin-review-shell .scholarship-form .form-label{margin-bottom:8px;color:#62767d;font-size:12px;font-weight:650;letter-spacing:.1px}
+.admin-review-shell .scholarship-form .form-control,
+.admin-review-shell .scholarship-form .form-select{color:#52666d;font-family:var(--default-font,inherit);font-size:14px;font-weight:400;line-height:1.6}
+.admin-review-shell .scholarship-form textarea.form-control{padding:11px 14px;line-height:1.7}
+.admin-review-shell .scholarship-form .form-control::placeholder{color:#9aa8ac;opacity:1;font-weight:400}
+.admin-review-shell .scholarship-form .form-text{margin-top:7px;color:#88979c;font-size:11px;line-height:1.55}
+.admin-review-shell .scholarship-form .requirement-item{padding:20px!important;border-color:#e3eaec!important;background:#fbfcfc}
+.admin-review-shell .scholarship-form .requirement-item legend{color:#697d83;font-size:11px!important}
+@media(max-width:575.98px){.admin-review-shell .scholarship-form .admin-card{padding:21px 18px}}
+/* Match the document add control to the teal plus reference. */
+.admin-review-shell .scholarship-form #add-requirement{width:52px;min-width:52px;height:50px;min-height:50px;padding:0!important;border:0;border-radius:8px;background:#317e92;color:#fff;box-shadow:0 4px 10px rgba(49,126,146,.14)}
+.admin-review-shell .scholarship-form #add-requirement:hover{background:#286b7c}
+.admin-review-shell .scholarship-form #add-requirement svg{width:27px;height:27px}
+/* Keep filter guidance and default selections visually secondary to results. */
+.admin-review-shell form.admin-card .form-control::placeholder{color:#9aa8ad;opacity:1;font-weight:400}
+.admin-review-shell form.admin-card .form-select{color:#8b999e;font-weight:500}

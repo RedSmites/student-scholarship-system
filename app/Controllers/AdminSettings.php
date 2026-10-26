@@ -88,7 +88,24 @@ class AdminSettings extends BaseController
         if ($newPassword !== '') {
             $updates['password_hash'] = password_hash($newPassword, PASSWORD_DEFAULT);
         }
-        $users->update($userId, $updates);
+        try {
+            $saved = $users->update($userId, $updates);
+        } catch (\Throwable $e) {
+            log_message('error', 'Administrator settings update failed for user #{userId}: {message}', [
+                'userId' => $userId,
+                'message' => $e->getMessage(),
+            ]);
+            $saved = false;
+        }
+        if (! $saved) {
+            log_message('error', 'Administrator settings update failed for user #{userId}: {errors}', [
+                'userId' => $userId,
+                'errors' => json_encode($users->errors()),
+            ]);
+            return redirect()->to(site_url('administrator/settings'))
+                ->withInput()
+                ->with('error', 'Your settings could not be saved. Please try again.');
+        }
 
         session()->set([
             'user_email' => $old['email'],
