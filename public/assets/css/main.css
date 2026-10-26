@@ -736,6 +736,16 @@ h6 {
   line-height: 0;
 }
 
+.scroll-top svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--contrast-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .scroll-top:hover {
   background-color: color-mix(in srgb, var(--accent-color), transparent 20%);
   color: var(--contrast-color);
