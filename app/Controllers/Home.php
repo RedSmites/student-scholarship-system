@@ -129,22 +129,22 @@ class Home extends BaseController
             ->where('scholarship_id', (int) $scholarship['id'])->where('is_active', 1)->findAll();
 
         $photo = $this->request->getFile('applicant_photo');
-        if (! $photo || ! $photo->isValid() || ! in_array($photo->getMimeType(), ['image/jpeg', 'image/png'], true)) {
-            return $fieldError('applicant_photo', 'Upload a valid applicant photo in JPG or PNG format.');
+        $uploadError = $this->uploadedFileError($photo, 'applicant_photo', 'Applicant photo', ['image/jpeg', 'image/png'], 5);
+        if ($uploadError !== null) {
+            return $fieldError('applicant_photo', $uploadError);
         }
         $uploadedFiles = $this->request->getFiles();
         $documentNames = [];
         foreach ($activeRequirements as $requirement) {
             $field = 'requirement_document_' . (int) $requirement['id'];
             $document = $this->request->getFile($field);
-            if (! $document || ! $document->isValid()) {
-                if (! empty($requirement['is_required'])) {
-                    return $fieldError($field, 'Attach a PDF for this required document.');
-                }
+            $label = (string) $requirement['requirement_name'];
+            $uploadError = $this->uploadedFileError($document, $field, $label, ['application/pdf'], 10);
+            if ($uploadError !== null && ($document === null || $document->getError() === UPLOAD_ERR_NO_FILE) && empty($requirement['is_required'])) {
                 continue;
             }
-            if ($document->getMimeType() !== 'application/pdf' || $document->getSizeByUnit('mb') > 10) {
-                return $fieldError($field, 'Choose a PDF file no larger than 10 MB.');
+            if ($uploadError !== null) {
+                return $fieldError($field, $uploadError);
             }
             $documentNames[] = ['requirement_id' => (int) $requirement['id'], 'requirement_name' => $requirement['requirement_name'], 'file_name' => $document];
         }
@@ -153,22 +153,22 @@ class Home extends BaseController
             return $fieldError('documents[]', 'Attach at least one supporting document as a PDF.');
         }
         foreach ($documents as $document) {
-            if (! $document instanceof UploadedFile || ! $document->isValid() || $document->getMimeType() !== 'application/pdf' || $document->getSizeByUnit('mb') > 10) {
-                return $fieldError('documents[]', 'Supporting documents must be PDF files no larger than 10 MB.');
+            if (! $document instanceof UploadedFile) {
+                return $fieldError('documents[]', 'The supporting document upload could not be read. Choose the PDF file again.');
             }
-        }
-        if ($photo->getSizeByUnit('mb') > 5) {
-            return $fieldError('applicant_photo', 'Applicant photo must be 5 MB or smaller.');
+            $uploadError = $this->uploadedFileError($document, 'documents[]', 'Supporting document', ['application/pdf'], 10);
+            if ($uploadError !== null) {
+                return $fieldError('documents[]', $uploadError);
+            }
         }
 
         $signatureUploads = [];
         foreach (['applicant' => 'Applicant', 'parent' => 'Parent'] as $key => $label) {
-            $signature = $this->request->getFile('signature_' . $key);
-            if (! $signature || ! $signature->isValid() || ! in_array($signature->getMimeType(), ['image/jpeg', 'image/png'], true)) {
-                return $fieldError('signature_' . $key, 'Attach a valid JPG or PNG signature image for ' . $label . '.');
-            }
-            if ($signature->getSizeByUnit('mb') > 5) {
-                return $fieldError('signature_' . $key, 'Each signature image must be 5 MB or smaller.');
+            $field = 'signature_' . $key;
+            $signature = $this->request->getFile($field);
+            $uploadError = $this->uploadedFileError($signature, $field, $label . ' signature', ['image/jpeg', 'image/png'], 5);
+            if ($uploadError !== null) {
+                return $fieldError($field, $uploadError);
             }
             $signatureUploads[] = ['file' => $signature, 'category' => 'signature_' . $key, 'requirement_id' => null, 'requirement_name' => $label . ' signature'];
         }
@@ -281,6 +281,51 @@ class Home extends BaseController
         }
         session()->setFlashdata('application_name', $applicantName);
         return redirect()->to(site_url('application/received'));
+    }
+
+    private function uploadedFileError(?UploadedFile $file, string $field, string $label, array $allowedMimeTypes, int $maxSizeMb): ?string
+    {
+        if ($file === null || $file->getError() === UPLOAD_ERR_NO_FILE) {
+            return 'Choose a file for ' . $label . '.';
+        }
+
+        $uploadError = $file->getError();
+        if ($uploadError !== UPLOAD_ERR_OK) {
+            $message = match ($uploadError) {
+                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'The selected file exceeds the server upload limit. Choose a smaller file or contact the scholarship office.',
+                UPLOAD_ERR_PARTIAL => 'The file upload was interrupted. Choose the file again and resubmit.',
+                UPLOAD_ERR_NO_TMP_DIR => 'The server upload temporary folder is unavailable. Please contact the scholarship office.',
+                UPLOAD_ERR_CANT_WRITE => 'The server could not save the uploaded file. Please contact the scholarship office.',
+                UPLOAD_ERR_EXTENSION => 'The server stopped this file upload. Please contact the scholarship office.',
+                default => 'The server could not receive this file. Choose it again and resubmit.',
+            };
+            log_message('warning', 'Application upload rejected for field {field} with PHP upload error {code}.', [
+                'field' => $field,
+                'code' => $uploadError,
+            ]);
+            return $message;
+        }
+
+        if (! $file->isValid()) {
+            log_message('warning', 'Application upload for field {field} did not pass PHP upload verification.', ['field' => $field]);
+            return 'The server could not verify this upload. Choose the file again and resubmit.';
+        }
+
+        if ($file->getSize() > $maxSizeMb * 1024 * 1024) {
+            return $label . ' must be ' . $maxSizeMb . ' MB or smaller.';
+        }
+
+        $mimeType = $file->getMimeType();
+        if (! in_array($mimeType, $allowedMimeTypes, true)) {
+            log_message('warning', 'Application upload for field {field} had unsupported detected MIME type {mime}.', [
+                'field' => $field,
+                'mime' => $mimeType,
+            ]);
+            $types = in_array('application/pdf', $allowedMimeTypes, true) ? 'a PDF' : 'a JPG or PNG image';
+            return 'The file contents are not recognized as ' . $types . '. Choose a valid ' . $types . ' file.';
+        }
+
+        return null;
     }
 
     public function received(): string

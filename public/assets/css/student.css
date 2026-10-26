@@ -133,3 +133,4 @@ html.js [data-aos].aos-animate{opacity:1;transform:translate3d(0,0,0)}
 .requirement-content p{margin:0;line-height:1.65}
 .optional-label{display:inline-block;margin-left:5px;padding:3px 7px;border-radius:999px;background:#f1f4f5;color:#66777c;font:700 9px var(--default-font);text-transform:uppercase;vertical-align:middle}
 @media(max-width:767px){.requirement-rows{gap:12px}.requirement-row{min-height:0;padding:20px 16px}}
+.field-validation-message{display:block;color:#b42318;font-size:12px;font-weight:600;line-height:1.5;margin-top:6px}.field-validation-message[hidden]{display:none!important}.form-errors-summary{margin-bottom:20px}.form-errors-summary p{color:inherit}
