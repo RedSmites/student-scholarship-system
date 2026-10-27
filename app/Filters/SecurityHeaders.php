@@ -34,6 +34,11 @@ class SecurityHeaders implements FilterInterface
         $response->setHeader('X-Content-Type-Options', 'nosniff');
         $response->setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        // Browsers only accept HSTS over HTTPS. Add it after TLS is active;
+        // the Apache config also covers static assets that bypass this filter.
+        if ($request->isSecure()) {
+            $response->setHeader('Strict-Transport-Security', 'max-age=31536000');
+        }
         header_remove('X-Powered-By');
 
         return $response;

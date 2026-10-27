@@ -9,7 +9,7 @@
   <link href="<?= base_url('assets/css/fonts.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/css/main.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/main.css'), 0, 8) ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/custom.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/student.css'), 0, 8) ?>" rel="stylesheet">
   <link href="<?= base_url('assets/css/student-home.css') ?>?v=<?= substr(md5_file(FCPATH . 'assets/css/student-home.css'), 0, 8) ?>" rel="stylesheet">
